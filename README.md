@@ -8,3 +8,5 @@
    Rød betyr kritisk mange viktige skadede spillere ute for den bestemte kampen, gul betyr litt kritisk og grønn ikke kritisk.
 
 For tiden jobber jeg med firebase brukerdatabase som skal kobles til prosjektet der man kan lage bruker og lagre statistikk på ulike lag og spillere.
+API kan kun innhente informasjon på 100 utrekk per dag, og maks 10 utrekk per minutt. Dette får konsekvenser når applikasjonen skal beregne skadestatus per kamp når man trykker på Vis knappen per liga.
+Derfor er den løsningen også fra en bestemt dato siden det er få kamper på denne dato-en her pga begrensende utrekk.
