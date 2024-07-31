@@ -1,0 +1,31 @@
+nav {
+    background-color: rgb(6, 35, 59);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+nav li {
+    margin: 20px;
+    list-style-type: none;
+}
+nav * {
+    display: inline;
+}
+a,  button {
+    color: yellow;
+    text-decoration: none;
+}
+button {
+    background-color: black;
+    border: solid;
+    border-color: black;
+}
+
+/* nav-h1 {
+left: 0;
+} */
