@@ -1,11 +1,12 @@
 import React from 'react'
 import './App.css';
-import { useEffect,useState } from 'react';
+import { useEffect,useState, useRef } from 'react';
+import { evaluatePlayerImpact, evaluateMatchStatus, apiOrgInfo } from './myFunctions';
 
 
 
 const MatchListing = (props) => {
-  const [toggle, setToggle] = useState(false);
+  
   const leaguesObjects = [];
   const leagues = Array.from(new Set(props.importMathces.map((match) => match.league.id)));//alle ligaene 
   const leagueInjuries = [...new Set(props.importInjuries.map(dataLeague=> dataLeague.league.id))]//alle ligaene med skade data
@@ -26,6 +27,8 @@ const MatchListing = (props) => {
 
 //objekter for å lagre cache data
 const [teamsPlayedMatches, setTeamsPlayedMatches] = useState({});
+const refTeamsPlayed = useRef({});
+const refSeasonsValues = useRef({});
 const [playerStats, setPlayerStats] = useState({});
 
 const hasKeyValueType = (obj, key, type) => {//data fecthing forbygging av samme data flere ganger
@@ -33,25 +36,18 @@ const hasKeyValueType = (obj, key, type) => {//data fecthing forbygging av samme
 };
 
   useEffect(() => {
-    const myHeaders = new Headers();
-              myHeaders.append("x-rapidapi-key", "436ccf9b5092f9960ceb89cfa9ac53fe");
-              myHeaders.append("x-rapidapi-host", "v3.football.api-sports.io");
-              
-
-    const requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow'};
-
     const fetchTeamStats = async (leagueID, teamID, fixtureDate) => {
-      if (!hasKeyValueType(teamsPlayedMatches, teamID, 'number')) { 
+      
+      const teamStatsApi = apiOrgInfo("teams/statistics", [{ league: leagueID}, {season: "2023"}, {team: teamID}, {date: fixtureDate}]);
+      if (teamStatsApi) { 
       try {
-        const response = await fetch(`http://localhost:8080/api/teams/statistics?league=${leagueID}&season=2023&team=${teamID}&date=${fixtureDate}`, requestOptions);
+        const response = await fetch(teamStatsApi.apiAddress, teamStatsApi.requestOptions);
         const string = await response.text();
         const teamStats = string===""? {}: JSON.parse(string);
         const totalMatches = teamStats.response.fixtures.played.total;//error beccause of undefined
         
         setTeamsPlayedMatches(prevTeamsPlayedMatches => ({ ...prevTeamsPlayedMatches, [teamID]: totalMatches}));
+        refTeamsPlayed.current[teamID] = totalMatches;
       } catch (error) {
         console.log(`Error: ${error}`);
       }
@@ -60,9 +56,10 @@ const hasKeyValueType = (obj, key, type) => {//data fecthing forbygging av samme
 
     
     const fetchPlayerStats = async (playerID, teamID) => {
+      const playerStatsApi = apiOrgInfo("players", [{ id: playerID}, {season: "2023"}, {team: teamID}]);
       if (!hasKeyValueType(playerStats, playerID, 'number') || !hasKeyValueType(teamsPlayedMatches, teamID, 'number')) { 
       try {
-        const response = await fetch(`http://localhost:8080/api/players?id=${playerID}&season=2023&team=${teamID}`, requestOptions);
+        const response = await fetch(playerStatsApi.apiAddress, playerStatsApi.requestOptions);
         const string = await response.text();
         const playerStats = string===""? {}: JSON.parse(string);
         const totalMatches = playerStats.response[0].statistics[0].games.lineups;
@@ -75,7 +72,7 @@ const hasKeyValueType = (obj, key, type) => {//data fecthing forbygging av samme
 
     }
 
-    let toggleMathces = props.importMathces.filter((match) => match.league.id === toggle);
+    let toggleMathces = props.importMathces.filter((match) => match.league.id === props.toggle);
     
     let toggleTeamInjuries = toggleMathces.flatMap((match) => {
       return props.importInjuries.filter(injured => 
@@ -83,109 +80,96 @@ const hasKeyValueType = (obj, key, type) => {//data fecthing forbygging av samme
       );
     });
     
-    
+    const delay = ms => new Promise(res => setTimeout(res, ms));
     
 
-    toggleTeamInjuries.forEach(async (player) => {
+    const processInjuries = async() => {
+      for (const player of toggleTeamInjuries){//for of loop for å pause hver data innhenting om skader
       try {
+        console.log(player.player.id, player.player.name, player.team.id, player.team.name);
         let statsPlayer = await fetchPlayerStats(player.player.id, player.team.id); 
-        if (statsPlayer && statsPlayer.response && statsPlayer.response.length > 0) {
-          let teamStats = await fetchTeamStats(
+        await delay(250);//pause for å unngå for mange requests 5 tillate api requests per sekund
+        console.log('useref', statsPlayer, !refTeamsPlayed.current[player.team.id], player.team.id);
+        if (statsPlayer && statsPlayer.response && !refTeamsPlayed.current[player.team.id]) { 
+          await fetchTeamStats(
             statsPlayer.response[0].statistics[0].league.id, 
             statsPlayer.response[0].statistics[0].team.id, 
             props.importMathces[0].fixture.date.slice(0,10)
           );
-          
-        } else {
-          console.error('No data returned for player stats');
         }
-      } catch (error) {
+        }
+       catch (error) {
         console.error('Error fetching player or team stats:', error);
       }
-    });
+    }
+    };
         
-    
-  }, [toggle]);
+    processInjuries();
 
-  
+  }, [props.toggle]);
 
-  const evaluatePlayerImpact = (playerImpact) => {
-    if (playerImpact>0.57){
-      return 2;//rød
-    }else if (playerImpact>0.28){
-      return 1;//gul
-    }else{
-      return 0;//grønn ul
-    }
-  }
-
-  const evaluateMatchStatus = (listPlayersImpacts) => {
-    const sum = listPlayersImpacts.reduce((a,b) => a+b, 0);
-    const numberInjuries = listPlayersImpacts.length;
-    if (sum>=8){
-      return ['r', numberInjuries, sum];//rød
-    }else if (sum>4){
-      return ['y', numberInjuries, sum];//gul
-    }else{
-      return ['g', numberInjuries, sum];//grønn
-    }
-  }
   
   const handleToggle = (leagueId) => {//render kamper fra en bestemt liga av gangen når vis knappen trykkes
-    setToggle(toggle === leagueId? false : leagueId);//viser kamper fra en bestemt liga av gangen
+    props.setToggle(props.toggle === leagueId? false : leagueId);//viser kamper fra en bestemt liga av gangen
 
   };
 
-  
-  return (
-    <div>
-      <table id="match-listing">
-        <tbody>
+        return (
+      <div>
+        <div className="grid-container-mthL">
           {leaguesObjects.map((league) => (
-            <React.Fragment key={league.id}>
-              <tr>
-                <td id="border-league">
-                  {league.country}:{league.name}
-                </td>
-                <td id='hide-show-match-btn'>
+            
+            <div>{/*parent node*/}
+              <div key={league.id} className="grid-item-border-league">
+              <div style={{gridColumn: "2 / 3"}}>
+                {league.country}:{league.name}
+              </div>
+              
+              <div id='hide-show-match-btn'>
                   <button onClick={() => handleToggle(league.id)}>Vis</button>
-                </td>
-              </tr>
-              {toggle === league.id && (//viser sett med kamper fra en bestemt liga
-                props.importMathces
-                  .filter((match) => match.league.id === league.id)
-                  .map((match) => (
-                    <tr key={match.fixture.id}>
-                      <td>{match.teams.home.name}-{match.teams.away.name}</td>
-                      <td>skader:
-                        {(() => {
-                          const impacts = props.importInjuries.filter(
-                            (injured) => [match.teams.home.name, match.teams.away.name].includes(injured.team.name)//finner bestemte skadede spillere for hver kamp
-                          )
-                          .map((injuredPlayer) => {//finner data om antall kamper for hver spiller og klubblag
-                            if (teamsPlayedMatches[injuredPlayer.team.id] && playerStats[injuredPlayer.player.id]) {//når objekt data er tilgjengelig for klubblag og spiller
-                              return evaluatePlayerImpact(playerStats[injuredPlayer.player.id]/teamsPlayedMatches[injuredPlayer.team.id]);//bedømmer skadevirkning for hver spiller
-                            }
-                            return null;
-                          })
-                          .filter(result => result !== null); // samler non-null innvirkning data
-                          //gi css farge gul og rød for y og r
-                          const colorMap = {r:"#C10037", y:"#EFF50E"};
-                          // liste innvirkning som tilsvarer mange tall
-                          let matchStatus = evaluateMatchStatus(impacts);//gir en liste med matchstatus for farge, antall skader og totalt antall innvirkningspoeng
-                          let criclecolor = colorMap[matchStatus[0]];
-                          return(<span><br />{matchStatus[1]}<div className='circle' style={{'--circle-color': criclecolor}} title='Match status indicator'></div></span>);
-                        })()}
-                        </td>
-                    </tr>
-                  ))
-              )}
-            </React.Fragment>
+                </div>
+              </div>
+              {props.toggle === league.id && ( // viser sett med kamper fra en bestemt liga
+                  props.importMathces
+                    .filter((match) => match.league.id === league.id)
+                    .map((match) => (
+                      <div key={match.fixture.id} className='grid-item-mtch-lstng'>
+                          <div style={{gridColumn: "1 / 2"}}>{match.teams.home.name}</div>
+                          <div style={{gridColumn: "2 / 3"}}>
+                            {console.log(match.fixture.date)}
+                            {props.resultExist ? `${match.goals.home}-${match.goals.away}` : match.fixture.date.slice(11, 16)}
+                          </div>
+                          <div style={{gridColumn: "3 / 4"}}>{match.teams.away.name}</div>
+                          <div style={{gridColumn: "4 / 4"}}>skader:
+                            {(() => {
+                              const impacts = props.importInjuries.filter(
+                                (injured) => [match.teams.home.name, match.teams.away.name].includes(injured.team.name)
+                              )
+                              .map((injuredPlayer) => {
+                                console.log(injuredPlayer.team.name, teamsPlayedMatches[injuredPlayer.team.id], playerStats[injuredPlayer.player.id]);//husk if statement for props
+                                if (teamsPlayedMatches[injuredPlayer.team.id] && playerStats[injuredPlayer.player.id]) {
+                                  return evaluatePlayerImpact(playerStats[injuredPlayer.player.id] / teamsPlayedMatches[injuredPlayer.team.id]);
+                                }
+                                return null;
+                              })
+                              .filter(result => result !== null);
+                              const colorMap = { r: "#C10037", y: "#EFF50E" };
+                              console.log(impacts);
+                              let matchStatus = evaluateMatchStatus(impacts);
+                              let criclecolor = colorMap[matchStatus[0]];
+                              
+                              return (<span><br />{matchStatus[1]}<div className='circle' style={{ '--circle-color': criclecolor }} title='Match status indicator'></div></span>);
+                            })()}
+                          </div>
+                      </div>
+                    ))
+                )}
+            </div>
+            
           ))}
-        </tbody>
-      </table>
-    </div>
-  );
+        </div>
+      </div>
+    );
   
 }
 

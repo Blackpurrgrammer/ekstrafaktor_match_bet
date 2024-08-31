@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
   margin-top: 80px;/* unngå nye liste elementer bak nav menyen */
@@ -32,18 +33,65 @@ ul li{
   list-style-type: none;
 }
 
-#match-listing{
-  border-collapse: collapse;
+.grid-container-mthL{
+  display: grid;
+  grid-template-rows:  max-content;
+  gap: 0; /* Juster gapet mellom kolonnene etter behov */
+  align-items: center;
+  justify-items: center;
+  padding: 0;
+  margin: 0;
+  
+  
 }
 
-#match-listing td{
+
+.grid-item-border-league{
+  display: grid;
+  grid-template-columns: auto 750px auto;
+  background-color: rgba(6, 35, 59, 0.526);
+  border-top: 1px solid black;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 30px;
+  width: 900px;
+  text-align: center;
+  margin: 0;
+}
+
+.grid-item-mtch-lstng{
+  display: grid;
+  font-family: Arial, Helvetica, sans-serif;
+  border: 1px solid black;
+  padding: 0px;/* 10px */
+  text-align: center;
+  grid-template-columns: 434px 70px 354px 100px;
+  gap: 0;
+  width: 958px;
+}
+
+
+
+
+.center-content {
+  text-align: center;
+  white-space: nowrap;
+}
+
+#player-listing{
+  border-collapse: collapse;
+  /* width: 100%; */
+}
+
+#player-listing td{
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
   border-top: 1px solid black;
-  padding: 30px;
+  padding: 30px;/* 10px */
   text-align: center;
-  /* width: 900px; */
 }
+
+
 
 #border-league{
   background-color: rgba(6, 35, 59, 0.526);
@@ -51,9 +99,12 @@ ul li{
 }
 
 #hide-show-match-btn{
+  text-align: center;
   background-color: rgba(6, 35, 59, 0.526);
   width: 0.1%;
   border-top: 1px solid black;
+  grid-column: 3 / 4;
+  margin: 0 auto;
 }
 
 .circle {
