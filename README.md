@@ -7,6 +7,5 @@
 3. Dagens kamper er hovedsiden der du ser kampstatus for hver kamp når det kommer til skadesituasjon for hver kamp
    Rød betyr kritisk mange viktige skadede spillere ute for den bestemte kampen, gul betyr litt kritisk og grønn ikke kritisk.
 
-For tiden jobber jeg med firebase brukerdatabase som skal kobles til prosjektet der man kan lage bruker og lagre statistikk på ulike lag og spillere.
-API kan kun innhente informasjon på 100 utrekk per dag, og maks 10 utrekk per minutt. Dette får konsekvenser når applikasjonen skal beregne skadestatus per kamp når man trykker på Vis knappen per liga.
-Derfor er den løsningen også fra en bestemt dato siden det er få kamper på denne dato-en her pga begrensende utrekk.
+For tiden jobber jeg med en mer detaljert info tabell for skadede spillere på en bestemt dato der man skal se info som skadet dato, skadevarighet i dager og innvirkningsstatus.
+API kan kun innhente informasjon på 7500 utrekk per dag, og maks 300 utrekk per minutt(5 utrekk per sekund). Dette får konsekvenser når applikasjonen skal beregne skadestatus per kamp når man trykker på Vis knappen per liga.
