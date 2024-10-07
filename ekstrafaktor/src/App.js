@@ -1,7 +1,4 @@
-// disse linjene under til import brukes for at useSWR skal funke
-/* eslint-disable */
-+ "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './Navbar';
 import DagensKamper from './DagensKamper';
@@ -18,7 +15,10 @@ function App() {
   const [injuries, setInjuries] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toggle, setToggle] = useState(false);
-  const teamStatsFetched = {};
+  const [teamsPlayedMatches, setTeamsPlayedMatches] = useState({});
+  const [playerStats, setPlayerStats] = useState({});
+  const refTeamsPlayed = useRef({});
+  const refPlayersStats = useRef({});
   
   useEffect(() => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -27,14 +27,14 @@ function App() {
     const fetchFixtures = async () => {
       fetch(fixtureEndpoint.apiAddress, fixtureEndpoint.requestOptions)
         .then(response => response.json())
-        .then(data => { setMatches(data.response); console.log(data) })
+        .then(data => { setMatches(data.response)})
         .catch(error => console.log('fixtures error', error));
     };
     
 
     const injuriesEndpoint = apiOrgInfo("injuries", [{ date: formattedDate}, {timezone: "europe/berlin" }]);
     const fetchInjuries = async () => {
-      fetch(injuriesEndpoint.apiAddress, injuriesEndpoint.requestOptions)//"https://v3.football.api-sports.io/injuries?date=2024-08-20&timezone=europe/paris"
+      fetch(injuriesEndpoint.apiAddress, injuriesEndpoint.requestOptions)
         .then(response => response.json())
         .then(data => setInjuries(data.response))
         .catch(error => console.log('injuries error', error));
@@ -48,7 +48,7 @@ function App() {
 
     setToggle(false);//kampliga velger tilbake til false når ny dag velges
 
-  }, [selectedDate]);//selectedDate
+  }, [selectedDate]);
 
   const handlePrevDay = () => {
     setSelectedDate(prevDate => addDays(prevDate, -1));
@@ -57,7 +57,6 @@ function App() {
   const handleNextDay = () => {
     setSelectedDate(prevDate => addDays(prevDate, 1));
   };
-  console.log("injuries", injuries);
   return (
     <Router>
       <div className='App'>
@@ -77,16 +76,33 @@ function App() {
             matches={matches} 
             toggle={toggle} 
             setToggle={setToggle} 
-            teamStatsFetched={teamStatsFetched}
+            teamsPlayedMatches={teamsPlayedMatches}
+            setTeamsPlayedMatches={setTeamsPlayedMatches}
+            playerStats={playerStats}
+            setPlayerStats={setPlayerStats}
+            refTeamsPlayed={refTeamsPlayed}
+            refPlayersStats={refPlayersStats}
             />} />
           <Route path="/Spilte_kamper" element={<SpilteKamper 
             injuries={injuries} 
-            matches={matches} 
-            selectedDate={selectedDate} 
+            matches={matches}  
             toggle={toggle} 
-            setToggle={setToggle} />} />
+            setToggle={setToggle}
+            teamsPlayedMatches={teamsPlayedMatches}
+            setTeamsPlayedMatches={setTeamsPlayedMatches}
+            playerStats={playerStats}
+            setPlayerStats={setPlayerStats}
+            refTeamsPlayed={refTeamsPlayed}
+            refPlayersStats={refPlayersStats}
+             />} />
           <Route path="/Avgjorende_skader" element={<AvgjorendeSkader 
             injuries={injuries} selectedDate={selectedDate}
+            teamsPlayedMatches={teamsPlayedMatches}
+            setTeamsPlayedMatches={setTeamsPlayedMatches}
+            playerStats={playerStats}
+            setPlayerStats={setPlayerStats}
+            refTeamsPlayed={refTeamsPlayed}
+            refPlayersStats={refPlayersStats}
              />} />
           <Route path="/Signin" element={<SignInUpPage />} />
         </Routes>
@@ -96,56 +112,3 @@ function App() {
 }
 
 export default App;
-
-// function App() {
-//   const [matches, setMatches] = useState([]);
-//   const [injuries, setInjuries] = useState([]);
-//   const [selectedDate, setSelectedDate] = useState(new Date());
-  
-
-//   useEffect(() => {
-//     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-
-//     const fixtureEndpoint = apiOrgInfo("fixtures", { date: formattedDate });
-//     const fetchFixtures = async () => {
-//       fetch(fixtureEndpoint.apiAddress, fixtureEndpoint.requestOptions)
-//         .then(response => response.json())
-//         .then(data => { setMatches(data.response) })
-//         .catch(error => console.log('fixtures error', error));
-//     };
-//     fetchFixtures();
-
-//     const injuriesEndpoint = apiOrgInfo("injuries", { date: formattedDate });
-//     const fetchInjuries = async () => {
-//       fetch(injuriesEndpoint.apiAddress, injuriesEndpoint.requestOptions)
-//         .then(response => response.json())
-//         .then(data => { setInjuries(data.response) })
-//         .catch(error => console.log('injuries error', error));
-//     };
-//     fetchInjuries();
-
-//   }, [selectedDate]);
-
-//   return (
-//     <Router>
-//       <div className='App'>
-//         <Navbar />
-//         <div className='date-picker'>
-//           <DatePicker
-//             selected={selectedDate}
-//             onChange={date => setSelectedDate(date)}
-//             dateFormat="yyyy-MM-dd"
-//           />  
-//         </div>
-//         <Routes>
-//           <Route path="/" element={<DagensKamper injuries={injuries} matches={matches} />} />
-//           <Route path="/Spilte_kamper" element={<SpilteKamper />} />
-//           <Route path="/Avgjorende_skader" element={<AvgjorendeSkader />} />
-//           <Route path="/Signin" element={<SignInUpPage />} />
-//         </Routes>
-//       </div>
-//     </Router>
-//   );
-// }
-
-// export default App;

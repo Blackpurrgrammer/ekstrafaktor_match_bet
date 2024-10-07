@@ -11,7 +11,18 @@ const DagensKamper = (props) => {
   return (
     <div>
         {props.matches && props.injuries ? (
-      <MatchListing importMathces={props.matches.filter((item)=>notStartedFilter(item))} importInjuries={props.injuries} toggle={props.toggle} setToggle={props.setToggle} resultExist={resultExist} />
+      <MatchListing importMathces={props.matches.filter((item)=>notStartedFilter(item))}
+        importInjuries={props.injuries} 
+        toggle={props.toggle}
+        setToggle={props.setToggle} 
+        resultExist={resultExist}
+        teamsPlayedMatches={props.teamsPlayedMatches}
+        setTeamsPlayedMatches={props.setTeamsPlayedMatches}
+        playerStats={props.playerStats}
+        setPlayerStats={props.setPlayerStats}
+        refTeamsPlayed={props.refTeamsPlayed}
+        refPlayersStats={props.refPlayersStats}
+         />
         ) : (
       <div>Loading matches or no matches found...</div>
         )}

@@ -1,4 +1,5 @@
 
+
 const apiOrgInfo = (endpoint, parameters)  => {
 
   let orgParam = Array.isArray(parameters)?
@@ -41,9 +42,70 @@ const evaluatePlayerImpact = (playerImpact) => {
     }
   }
 
-  const hasKeyValueType = (obj, key, type) => {//data fecthing forbygging av samme data flere ganger
-    return obj.hasOwnProperty(key) && typeof obj[key] === type;
+  const fetchTeamStats = async (leagueID, teamID, fixtureDate, setState, refVar) => {
+      
+    const teamStatsApi = apiOrgInfo("teams/statistics", [{ league: leagueID}, {season: "2023"}, {team: teamID}, {date: fixtureDate}]);
+    if (teamStatsApi) { 
+    try {
+      const response = await fetch(teamStatsApi.apiAddress, teamStatsApi.requestOptions);
+      const string = await response.text();
+      const teamStats = string===""? {}: JSON.parse(string);
+      const totalMatches = teamStats.response.fixtures.played.total;//error beccause of undefined
+      
+      setState(prevTeamsPlayedMatches => ({ ...prevTeamsPlayedMatches, [teamID]: totalMatches}));
+      refVar.current[teamID] = totalMatches;
+    } catch (error) {
+      console.log(`Error: ${error}`);
+      throw error;
+    }
+  }
   };
 
   
-export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, hasKeyValueType};
+  const fetchPlayerStats = async (playerID, teamID, setState, setRef) => {
+    const playerStatsApi = apiOrgInfo("players", [{ id: playerID}, {season: "2023"}, {team: teamID}]);
+    try {
+      
+      const response = await fetch(playerStatsApi.apiAddress, playerStatsApi.requestOptions);
+      const string = await response.text();
+      const playerStats = string===""? {}: JSON.parse(string);
+      const totalMatches = playerStats.response[0].statistics[0].games.lineups;
+      const playerName = playerStats.response[0].player.name;
+      const playerTeam = playerStats.response[0].statistics[0].team.name;
+
+      // setState(prevPlayerStats => ({ ...prevPlayerStats, [playerID]: totalMatches}));
+      setState(prevPlayerStats => ({ ...prevPlayerStats, 
+        [playerID]: {"played": totalMatches, "name": playerName, "team": playerTeam}}));
+      setRef.current[playerID] = totalMatches;
+      return playerStats;//få frem hovedliga 
+    } catch (error) {
+      console.log(`Error: ${error}`);
+      throw error;
+    }
+  
+
+  }
+
+ const fetchSidelinedDate = async(playerID, setState, matchDate) => {
+    const sidelinedApi = apiOrgInfo("sidelined", [{ player: playerID}]);
+    try {
+      const sidelinedRes = await fetch(sidelinedApi.apiAddress, sidelinedApi.requestOptions);
+      const sidelinedString = await sidelinedRes.text();
+      const sidelined = sidelinedString===""? {}: JSON.parse(sidelinedString);
+      const injuredStartDate = new Date(sidelined.response[0].start);
+      const injuryType =  sidelined.response[0].type;
+      const daysDuration = Math.round((matchDate - injuredStartDate) / (1000 * 60 * 60 * 24));//floor?
+      setState(prevPlayerStats => ({ ...prevPlayerStats, [playerID]: 
+        {   ...prevPlayerStats[playerID], 
+            "injured": injuredStartDate,
+             "injuryType": injuryType,
+              "duration": daysDuration}}));
+      return {"injured": injuredStartDate, "injuryType": injuryType};
+    } catch (error) {
+      console.log(`Error: ${error}`);
+      throw error;
+    }
+  }
+ 
+  
+export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats, fetchSidelinedDate};

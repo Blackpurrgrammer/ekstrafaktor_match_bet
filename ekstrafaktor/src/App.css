@@ -80,6 +80,9 @@ ul li{
 
 #player-listing{
   border-collapse: collapse;
+  align-items: center;
+  justify-items: center;
+  margin: 0 auto;
   /* width: 100%; */
 }
 
