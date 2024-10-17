@@ -1,7 +1,7 @@
 
 .App {
   text-align: center;
-  margin-top: 80px;/* unngå nye liste elementer bak nav menyen */
+  margin-top: 80px;
 }
 
 .App-logo {
@@ -36,13 +36,13 @@ ul li{
 .grid-container-mthL{
   display: grid;
   grid-template-rows:  max-content;
-  gap: 0; /* Juster gapet mellom kolonnene etter behov */
+  gap: 0; 
   align-items: center;
   justify-items: center;
   padding: 0;
   margin: 0;
-  
-  
+
+
 }
 
 
@@ -70,8 +70,51 @@ ul li{
   width: 958px;
 }
 
+.pagination {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5rem;
+  font-size: small;
+  gap: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
+.pagination .page-item {
+  padding: 4px 4px;
+  cursor: pointer;
+  border-radius: 2px;
+  color: black;
+}
 
+.pagination .page-item a {
+  text-decoration: none;
+  color: black;
+  padding: 4px; 
+}
+
+.pagination .page-item:hover {
+  background-color: rgba(6, 35, 59, 0.526);
+  padding: 4px; 
+}
+
+.pagination .active-page {
+  background-color: rgba(6, 35, 59, 0.526);
+  padding: 4px;
+}
+
+.pagination .page-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  cursor: pointer;
+  background-color: black;
+  width: 100px;
+  height: 30px;
+  font-size: 14px;
+}
 
 .center-content {
   text-align: center;
@@ -83,14 +126,13 @@ ul li{
   align-items: center;
   justify-items: center;
   margin: 0 auto;
-  /* width: 100%; */
 }
 
 #player-listing td{
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
   border-top: 1px solid black;
-  padding: 30px;/* 10px */
+  padding: 30px;
   text-align: center;
 }
 
@@ -108,17 +150,35 @@ ul li{
   border-top: 1px solid black;
   grid-column: 3 / 4;
   margin: 0 auto;
+  cursor: pointer;
+}
+
+.date-picker{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-picker button{
+  display: inline-block;
+  background-color: black;
+  padding: 4px;
+  cursor: pointer;
+  width: 100px;
+  height: 30px;
+  font-size: 14px;
 }
 
 .circle {
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background-color: var(--circle-color, #7CFC00); /* Default color is black */
+  background-color: var(--circle-color, #7CFC00); 
   display: inline-block;
-  vertical-align: middle;/* aligns the circle vertically with the text */
-  transform: translateY(-1px);/* aligns the circle little  bit upper vertically with the text */
-  
+  vertical-align: middle;
+  transform: translateY(-1px);
+
 }
 
 .signin-button{

@@ -24,6 +24,7 @@ button {
     background-color: black;
     border: solid;
     border-color: black;
+    cursor: pointer;
 }
 
 /* nav-h1 {

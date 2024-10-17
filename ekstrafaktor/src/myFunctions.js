@@ -15,7 +15,7 @@ const apiOrgInfo = (endpoint, parameters)  => {
   headers: myHeaders,
   redirect: 'follow'
   };
-  const apiWithEndpoint = `http://localhost:8080/api/${endpoint}?${orgParam}`;// https://v3.football.api-sports.io/
+  const apiWithEndpoint = `http://localhost:8080/api/${endpoint}?${orgParam}`;
   const adressWithOptions = {apiAddress:apiWithEndpoint, requestOptions:requestOptions};
   return adressWithOptions;//
 }
@@ -26,7 +26,7 @@ const evaluatePlayerImpact = (playerImpact) => {
     }else if (playerImpact>0.28){
       return 1;//gul
     }else{
-      return 0;//grønn ul
+      return 0;//grønn
     }
   }
 
@@ -50,7 +50,7 @@ const evaluatePlayerImpact = (playerImpact) => {
       const response = await fetch(teamStatsApi.apiAddress, teamStatsApi.requestOptions);
       const string = await response.text();
       const teamStats = string===""? {}: JSON.parse(string);
-      const totalMatches = teamStats.response.fixtures.played.total;//error beccause of undefined
+      const totalMatches = teamStats.response.fixtures.played.total;
       
       setState(prevTeamsPlayedMatches => ({ ...prevTeamsPlayedMatches, [teamID]: totalMatches}));
       refVar.current[teamID] = totalMatches;
@@ -73,9 +73,8 @@ const evaluatePlayerImpact = (playerImpact) => {
       const playerName = playerStats.response[0].player.name;
       const playerTeam = playerStats.response[0].statistics[0].team.name;
 
-      // setState(prevPlayerStats => ({ ...prevPlayerStats, [playerID]: totalMatches}));
       setState(prevPlayerStats => ({ ...prevPlayerStats, 
-        [playerID]: {"played": totalMatches, "name": playerName, "team": playerTeam}}));
+        [playerID]: {"played": totalMatches, "name": playerName, "team": playerTeam, "id": playerID}}));
       setRef.current[playerID] = totalMatches;
       return playerStats;//få frem hovedliga 
     } catch (error) {
@@ -91,16 +90,27 @@ const evaluatePlayerImpact = (playerImpact) => {
     try {
       const sidelinedRes = await fetch(sidelinedApi.apiAddress, sidelinedApi.requestOptions);
       const sidelinedString = await sidelinedRes.text();
-      const sidelined = sidelinedString===""? {}: JSON.parse(sidelinedString);
+      let sidelined = sidelinedString===""? {}: JSON.parse(sidelinedString);
+      if(sidelined.results!==0){//skade detaljer tilgjengelig for spiller
       const injuredStartDate = new Date(sidelined.response[0].start);
       const injuryType =  sidelined.response[0].type;
-      const daysDuration = Math.round((matchDate - injuredStartDate) / (1000 * 60 * 60 * 24));//floor?
+      const daysDuration = Math.round((matchDate - injuredStartDate) / (1000 * 60 * 60 * 24));
       setState(prevPlayerStats => ({ ...prevPlayerStats, [playerID]: 
         {   ...prevPlayerStats[playerID], 
             "injured": injuredStartDate,
              "injuryType": injuryType,
               "duration": daysDuration}}));
-      return {"injured": injuredStartDate, "injuryType": injuryType};
+        }else if(sidelined.results === 0 && !("rateLimit" in sidelined.errors)){//skade detaljer utilgjengelig for spiller
+          setState(prevPlayerStats => ({ ...prevPlayerStats, [playerID]:
+            {   ...prevPlayerStats[playerID], 
+                "injured": "N/A",
+                 "injuryType": "N/A",
+                  "duration": "N/A"}}));
+        }else if ("rateLimit" in sidelined.errors){//rate limit er oversteget for forespørsel
+          sidelined = {errors: false, player: playerID, errorsMSG: sidelined.errors};//returnerer spiller id for å gjøre nytt API kall
+          return sidelined;
+        };
+      return sidelined;
     } catch (error) {
       console.log(`Error: ${error}`);
       throw error;
