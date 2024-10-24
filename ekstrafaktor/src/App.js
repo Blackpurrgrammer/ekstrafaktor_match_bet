@@ -7,7 +7,7 @@ import AvgjorendeSkader from './AvgjorendeSkader';
 import SignInUpPage from './SignInUpPage';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format, addDays, set } from 'date-fns';
+import { format, addDays} from 'date-fns';
 import {apiOrgInfo} from './myFunctions';
 
 function App() {
@@ -19,6 +19,7 @@ function App() {
   const [playerStats, setPlayerStats] = useState({});
   const refTeamsPlayed = useRef({});
   const refPlayersStats = useRef({});
+  const [readyRendering, setReadyRendering] = useState(false);
   
   useEffect(() => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -47,6 +48,7 @@ function App() {
     fetchFixtures();
 
     setToggle(false);//kampliga velger tilbake til false når ny dag velges
+    setReadyRendering(false);
 
   }, [selectedDate]);
 
@@ -65,8 +67,10 @@ function App() {
           <button onClick={handlePrevDay}>&lt;Forrige dag</button>
           <DatePicker
             selected={selectedDate}
-            onChange={date => setSelectedDate(date)}
+            onChange={date => {setSelectedDate(date)}}
             dateFormat="yyyy-MM-dd"
+            prevMonthButtonDisabled
+            nextMonthButtonDisabled
           />
           <button onClick={handleNextDay}>Neste dag&gt;</button>
         </div>
@@ -96,13 +100,16 @@ function App() {
             refPlayersStats={refPlayersStats}
              />} />
           <Route path="/Avgjorende_skader" element={<AvgjorendeSkader 
-            injuries={injuries} selectedDate={selectedDate}
+            injuries={injuries} 
+            selectedDate={selectedDate}
             teamsPlayedMatches={teamsPlayedMatches}
             setTeamsPlayedMatches={setTeamsPlayedMatches}
             playerStats={playerStats}
             setPlayerStats={setPlayerStats}
             refTeamsPlayed={refTeamsPlayed}
             refPlayersStats={refPlayersStats}
+            readyRendering={readyRendering}
+            setReadyRendering={setReadyRendering}
              />} />
           <Route path="/Signin" element={<SignInUpPage />} />
         </Routes>

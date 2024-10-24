@@ -72,9 +72,17 @@ const evaluatePlayerImpact = (playerImpact) => {
       const totalMatches = playerStats.response[0].statistics[0].games.lineups;
       const playerName = playerStats.response[0].player.name;
       const playerTeam = playerStats.response[0].statistics[0].team.name;
-
+      const playerLeague = playerStats.response[0].statistics[0].league.name;
+      const playerTeamId = playerStats.response[0].statistics[0].team.id;
+      const playerLeagueId = playerStats.response[0].statistics[0].league.id;
       setState(prevPlayerStats => ({ ...prevPlayerStats, 
-        [playerID]: {"played": totalMatches, "name": playerName, "team": playerTeam, "id": playerID}}));
+        [playerID]: {"played": totalMatches,
+           "name": playerName,
+            "team": playerTeam,
+             "teamId": playerTeamId,
+             "league": playerLeague,
+              "leagueId": playerLeagueId,
+              "id": playerID}}));
       setRef.current[playerID] = totalMatches;
       return playerStats;//få frem hovedliga 
     } catch (error) {
