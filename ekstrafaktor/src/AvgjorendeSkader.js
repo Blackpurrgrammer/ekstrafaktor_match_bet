@@ -1,15 +1,21 @@
 /* eslint-disable */
 import React from 'react'
 import './App.css';
-import { useEffect, useState} from 'react';
+import { useEffect, useState, useRef} from 'react';
 import {fetchSidelinedDate } from './myFunctions';
 import ReactPaginate from 'react-paginate';
+import FilterDrawer from './FilterDrawer';
+
+
 
 
 const AvgjorendeSkader = (props) => {
-  const [currentItems, setCurrentItems] = useState(null);
+  const [checkedKeys, setCheckedKeys] = useState([]);
+  const [currentItems, setCurrentItems] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [pageNumber, setPageNumber] = useState(0);
+  
   const itemsPerPage = 10;
   let listedPlayerIdInjuries = props.injuries.map(item=>item.player.id.toString());//
   let keysObjectArray = Object.keys(props.playerStats).filter(
@@ -20,6 +26,15 @@ const AvgjorendeSkader = (props) => {
   let fetchedPlayersArrayKeys = fetchedPlayersArray.map(player=>player.id.toString())//henter ut spiller id for skadede spillere og type string konvertering slik at filter fungerer
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
   let milliseconds = 500;//ventetid for API kall for at ikke rate limit skal bli oversteget
+  
+
+  const emptyArrayFiltering = (optionArray, filteringValue) => {//slik at tom liste returnerer true med inlcudes metoden
+    const cleanArray = optionArray.filter(item => item !== null && item !== undefined && item !== '');
+    if (cleanArray.length === 0) {
+      return true;
+    }
+    return cleanArray.includes(filteringValue);
+  }
 
   useEffect(() => {
     //gjentar inni useEffect for at skal oppdatere filterering for hver render kalender navigasjon endring
@@ -66,16 +81,38 @@ const AvgjorendeSkader = (props) => {
     const playersContainInjury = Object.entries(props.playerStats).filter(([playerId, stats]) => "injured" in stats && keysObjectArray.includes(playerId));//filtrerer ut skadede spillere for kampdato
     const lengthPlayersStats = keysObjectArray.length;
     const lengthPlayersInjured = playersContainInjury.length;
-    if (lengthPlayersStats === lengthPlayersInjured) {//sjekker om alle spillere har vært innom API kall fetchSidelinedDate
+    //listene under holder styr på sanntid filteringen
+    const filteringLeagueList = [];
+    const filteringTeamList = [];
+    const filteringInjuryTypeList = [];
+    const resultat = lengthPlayersStats === lengthPlayersInjured && lengthPlayersInjured>0 && (currentItems.length===0 || fetchedPlayersArrayKeys.length>0);
+    
+    if (lengthPlayersStats === lengthPlayersInjured && lengthPlayersInjured>0 && (currentItems.length===0 || fetchedPlayersArrayKeys.length>0)) {//sjekker om alle spillere har vært innom API kall fetchSidelinedDate
       props.setReadyRendering(true);
     }
-    
+    for (let checkedKey of checkedKeys){
+      const keyItem = checkedKey.split('-');
+      if (keyItem[0] === 'Liga' && keyItem.length>2) {
+        filteringLeagueList.push(keyItem[2]);
+      } else if (keyItem[0] === 'Lag' && keyItem.length>2) {
+        filteringTeamList.push(keyItem[2]);
+      } else if (keyItem[0] === 'Typeskade') {
+        filteringInjuryTypeList.push(keyItem[1]);
+      }
+    }
+
     if (props.readyRendering) {//klarsignal for at alle spillere har blitt hentet og kan starte paginerings beregning
-      const items = Object.values(props.playerStats).filter((player) => keysObjectArray.includes(player.id.toString()));//filtrerer ut skadede spillere for kampdato
+      const items = Object.values(props.playerStats).filter((player) =>//hjelper filter komponenten for å filtrere ut spillere
+        keysObjectArray.includes(player.id.toString()) &&
+        emptyArrayFiltering(filteringLeagueList, player.leagueId.toString()) &&
+        emptyArrayFiltering(filteringTeamList, player.teamId.toString()) &&
+        emptyArrayFiltering(filteringInjuryTypeList, player.injuryType));//filtrerer ut skadede spillere for kampdato
       const endOffset = itemOffset + itemsPerPage;//regner siste liste indeks for hver side
       const newCurrentItems = items.slice(itemOffset, endOffset);//indekserer mengden som skal vises på visning side
       const newPageCount = Math.ceil(items.length / itemsPerPage);
-  
+      
+      
+
       setCurrentItems((prevCurrentItems) => {//setter forrige og aktuelle spillere til en bestemt side
         if (JSON.stringify(prevCurrentItems) !== JSON.stringify(newCurrentItems)) {
           return newCurrentItems;
@@ -89,16 +126,27 @@ const AvgjorendeSkader = (props) => {
         }
         return prevPageCount;
       });
-    }
-  
+      
+      if(pageCount>0 && items.length>0 && currentItems.length===0){//om tom paginering - side 0 auto navigering
+        handlePageClick({ selected: 0 });
+      }
+      
+    };
   }, [itemOffset, itemsPerPage, props.readyRendering, props.playerStats, props.selectedDate, keysObjectArray]);
+  
 
-  const handlePageClick = (event) => {
+  useEffect(() => {
+    props.setReadyRendering(false);
+  }, [props.selectedDate]);
+
+  const handlePageClick = (event) => {//håndterer paginering
     const items = Object.values(props.playerStats);
     const newOffset = event.selected * itemsPerPage % items.length;
     
     setItemOffset(newOffset);
+
   };
+  
   
   return (
     <div>
@@ -112,6 +160,15 @@ const AvgjorendeSkader = (props) => {
               <h1>Skadede spillere i dine viste kamper:</h1>
             </thead>
           </table>
+          <FilterDrawer
+            data={currentItems}
+            checkedKeys={checkedKeys}
+            setCheckedKeys={setCheckedKeys}
+            readyRendering={props.readyRendering}
+            selectedDate={props.selectedDate}
+            setPageNumber={setPageNumber}
+            setCurrentItems={setCurrentItems}
+          />
           <table id='player-listing'>
             <thead>
               <tr>
@@ -142,6 +199,23 @@ const AvgjorendeSkader = (props) => {
               })}
             </tbody>
           </table>
+          <ReactPaginate
+            previousLabel={'<Forrige'}
+            nextLabel={'Neste>'}
+            breakLabel={'...'}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            renderOnZeroPageCount={null}
+            containerClassName='pagination'
+            pageClassName='page-item'
+            previousLinkClassName='page-nav'
+            nextLinkClassName='page-nav'
+            activeLinkClassName='active-page'
+            disableInitialCallback={true}
+            forcePage={pageNumber}
+          />
         </>
       ) : (//om objektet er tomt fordi ingen kamper har blitt vist
         <h1>Du må se på kamper før du kan se skader her! Gå til dagenskamper eller spilte kamper</h1>
@@ -151,23 +225,10 @@ const AvgjorendeSkader = (props) => {
         Alle de skadede spillerne er listet opp over for dine viste kamper. Jo flere kamper du har blitt vist, jo flere spillere vil bli listet opp.
       </p>
       <p>
-        Grunnen for at ikke alle de skadede spillerne er listet opp, er at det er en begrensning på antall data uthentinger fra min API leverandør, og prosessen ville vært for tidkrevende. 
+        Grunnen til at ikke alle de skadede spillerne er listet opp, er at det er en begrensning på antall data uthentinger fra min API leverandør, og prosessen ville vært for tidkrevende. 
       </p>
-      <ReactPaginate
-        previousLabel={'<Forrige'}
-        nextLabel={'Neste>'}
-        breakLabel={'...'}
-        pageCount={pageCount}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        onPageChange={handlePageClick}
-        renderOnZeroPageCount={null}
-        containerClassName='pagination'
-        pageClassName='page-item'
-        previousLinkClassName='page-nav'
-        nextLinkClassName='page-nav'
-        activeLinkClassName='active-page'
-         />
+      
+      
     </div>
   );
 };

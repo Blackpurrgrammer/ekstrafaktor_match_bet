@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Navbar from './Navbar';
 import DagensKamper from './DagensKamper';
 import SpilteKamper from './SpilteKamper';
@@ -7,7 +7,7 @@ import AvgjorendeSkader from './AvgjorendeSkader';
 import SignInUpPage from './SignInUpPage';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format, addDays} from 'date-fns';
+import { format, addDays, set} from 'date-fns';
 import {apiOrgInfo} from './myFunctions';
 
 function App() {
@@ -20,6 +20,7 @@ function App() {
   const refTeamsPlayed = useRef({});
   const refPlayersStats = useRef({});
   const [readyRendering, setReadyRendering] = useState(false);
+
   
   useEffect(() => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -49,31 +50,36 @@ function App() {
 
     setToggle(false);//kampliga velger tilbake til false når ny dag velges
     setReadyRendering(false);
-
+  
   }, [selectedDate]);
+
 
   const handlePrevDay = () => {
     setSelectedDate(prevDate => addDays(prevDate, -1));
+    setReadyRendering(false);
   };
 
   const handleNextDay = () => {
     setSelectedDate(prevDate => addDays(prevDate, 1));
+    setReadyRendering(false);
   };
   return (
-    <Router>
+    
       <div className='App'>
-        <Navbar />
+        <Router>
+        <Navbar/>
         <div className='date-picker'>
           <button onClick={handlePrevDay}>&lt;Forrige dag</button>
           <DatePicker
             selected={selectedDate}
-            onChange={date => {setSelectedDate(date)}}
+            onChange={date => {setSelectedDate(date); setReadyRendering(false);}}
             dateFormat="yyyy-MM-dd"
             prevMonthButtonDisabled
             nextMonthButtonDisabled
           />
           <button onClick={handleNextDay}>Neste dag&gt;</button>
         </div>
+        
         <Routes>
           <Route path="/" element={<DagensKamper
             injuries={injuries}
@@ -113,8 +119,9 @@ function App() {
              />} />
           <Route path="/Signin" element={<SignInUpPage />} />
         </Routes>
+        </Router>
       </div>
-    </Router>
+    
   );
 }
 

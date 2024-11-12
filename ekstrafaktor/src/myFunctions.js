@@ -62,7 +62,7 @@ const evaluatePlayerImpact = (playerImpact) => {
   };
 
   
-  const fetchPlayerStats = async (playerID, teamID, setState, setRef) => {
+  const fetchPlayerStats = async (playerID, teamID, setState, setRef, currentLeagueId, currentLeagueName) => {
     const playerStatsApi = apiOrgInfo("players", [{ id: playerID}, {season: "2023"}, {team: teamID}]);
     try {
       
@@ -80,8 +80,8 @@ const evaluatePlayerImpact = (playerImpact) => {
            "name": playerName,
             "team": playerTeam,
              "teamId": playerTeamId,
-             "league": playerLeague,
-              "leagueId": playerLeagueId,
+             "league": currentLeagueName,
+              "leagueId": currentLeagueId,
               "id": playerID}}));
       setRef.current[playerID] = totalMatches;
       return playerStats;//få frem hovedliga 

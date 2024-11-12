@@ -4,7 +4,7 @@ import Search from './Search';
 import SignInUpButton from './SignInUpH';
 import { Link, useLocation } from 'react-router-dom';
 
-const Navbar = () => {
+const Navbar = (props) => {
   const location = useLocation();
   const hideNavbarPaths = ['/Signin'];
 

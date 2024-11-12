@@ -191,6 +191,13 @@ ul li{
 
 }
 
+.filter-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 .signin-button{
   margin-left: auto;
 }

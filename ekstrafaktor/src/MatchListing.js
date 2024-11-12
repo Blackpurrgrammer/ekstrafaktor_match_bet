@@ -39,7 +39,7 @@ const MatchListing = (props) => {
     const processInjuries = async() => {
       for (const player of toggleTeamInjuries){//for of loop for å pause hver data innhenting om skader
       try {
-        let statsPlayer = await fetchPlayerStats(player.player.id, player.team.id, props.setPlayerStats, props.refPlayersStats); 
+        let statsPlayer = await fetchPlayerStats(player.player.id, player.team.id, props.setPlayerStats, props.refPlayersStats, toggleMathces[0].league.id, toggleMathces[0].league.name); 
         await delay(250);//pause for å unngå for mange requests 5 tillate api requests per sekund
         if (statsPlayer && statsPlayer.response && !props.refTeamsPlayed.current[player.team.id]) { 
           await fetchTeamStats(
