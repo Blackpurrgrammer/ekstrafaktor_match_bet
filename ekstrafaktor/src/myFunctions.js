@@ -17,7 +17,7 @@ const apiOrgInfo = (endpoint, parameters)  => {
   };
   const apiWithEndpoint = `http://localhost:8080/api/${endpoint}?${orgParam}`;
   const adressWithOptions = {apiAddress:apiWithEndpoint, requestOptions:requestOptions};
-  return adressWithOptions;//
+  return adressWithOptions;
 }
 
 const evaluatePlayerImpact = (playerImpact) => {
@@ -29,6 +29,16 @@ const evaluatePlayerImpact = (playerImpact) => {
       return 0;//grønn
     }
   }
+
+const evaluatePlayerStatus = (playerImpactValue) => {
+  if (playerImpactValue===2){
+    return 'r';//rød
+  }else if (playerImpactValue===1){
+    return 'y';//gul
+  }else{
+    return 'g';//grønn
+  }
+}
 
   const evaluateMatchStatus = (listPlayersImpacts) => {
     const sum = listPlayersImpacts.reduce((a,b) => a+b, 0);
@@ -72,9 +82,7 @@ const evaluatePlayerImpact = (playerImpact) => {
       const totalMatches = playerStats.response[0].statistics[0].games.lineups;
       const playerName = playerStats.response[0].player.name;
       const playerTeam = playerStats.response[0].statistics[0].team.name;
-      const playerLeague = playerStats.response[0].statistics[0].league.name;
       const playerTeamId = playerStats.response[0].statistics[0].team.id;
-      const playerLeagueId = playerStats.response[0].statistics[0].league.id;
       setState(prevPlayerStats => ({ ...prevPlayerStats, 
         [playerID]: {"played": totalMatches,
            "name": playerName,
@@ -126,4 +134,4 @@ const evaluatePlayerImpact = (playerImpact) => {
   }
  
   
-export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats, fetchSidelinedDate};
+export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats, fetchSidelinedDate, evaluatePlayerStatus};

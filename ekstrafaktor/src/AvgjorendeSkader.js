@@ -5,6 +5,7 @@ import { useEffect, useState, useRef} from 'react';
 import {fetchSidelinedDate } from './myFunctions';
 import ReactPaginate from 'react-paginate';
 import FilterDrawer from './FilterDrawer';
+import FactorIndicator from './FactorIndicator';
 
 
 
@@ -177,6 +178,7 @@ const AvgjorendeSkader = (props) => {
                 <th>Skadedato</th>
                 <th>Skadevarighet-dager</th>
                 <th>Typeskade</th>
+                <th>Status indikator</th>
               </tr>
             </thead>
             <tbody>
@@ -190,6 +192,8 @@ const AvgjorendeSkader = (props) => {
                       <td>{injuredDate.toLocaleDateString()}</td>
                       <td>{stats.duration}</td>
                       <td>{stats.injuryType}</td>
+                      {/* vurderer hvor stor innvirkning spilleren har på laget */}
+                      <td><FactorIndicator item={stats} showType='Player' playerStats={props.playerStats} teamsPlayedMatches={props.teamsPlayedMatches} /></td>
                     </tr>
                   );
                 } else {

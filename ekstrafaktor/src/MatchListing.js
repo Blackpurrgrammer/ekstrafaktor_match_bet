@@ -1,9 +1,8 @@
 import React from 'react'
 import './App.css';
 import { useEffect} from 'react';
-import { evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats } from './myFunctions';
-
-
+import FactorIndicator from './FactorIndicator';
+import { fetchPlayerStats, fetchTeamStats} from './myFunctions';
 
 const MatchListing = (props) => {
   
@@ -93,23 +92,12 @@ const MatchListing = (props) => {
                           </div>
                           <div style={{gridColumn: "3 / 4"}}>{match.teams.away.name}</div>
                           <div style={{gridColumn: "4 / 4"}}>skader:
-                            {(() => {//annonimous function for å vise match status indikator
-                              const impacts = props.importInjuries.filter(
-                                (injured) => [match.teams.home.name, match.teams.away.name].includes(injured.team.name)
-                              )
-                              .map((injuredPlayer) => {
-                                if (props.playerStats && props.teamsPlayedMatches[injuredPlayer.team.id] && !!props.playerStats[injuredPlayer.player.id]?.played) {
-                                  return evaluatePlayerImpact(props.playerStats[injuredPlayer.player.id].played / props.teamsPlayedMatches[injuredPlayer.team.id]);
-                                }
-                                return null;
-                              })
-                              .filter(result => result !== null);
-                              const colorMap = { r: "#C10037", y: "#EFF50E" };
-                              let matchStatus = evaluateMatchStatus(impacts);
-                              let criclecolor = colorMap[matchStatus[0]];
-                              
-                              return (<span><br />{matchStatus[1]}<div className='circle' style={{ '--circle-color': criclecolor }} title='Match status indicator'></div></span>);
-                            })()}
+                            {/* samlet skade innvirkning per kamp*/}
+                            {<FactorIndicator item={match}
+                               importInjuries={props.importInjuries}
+                               playerStats={props.playerStats}
+                               teamsPlayedMatches={props.teamsPlayedMatches}
+                               showType='Match' />}
                           </div>
                       </div>
                     ))
