@@ -7,8 +7,9 @@ import AvgjorendeSkader from './AvgjorendeSkader';
 import SignInUpPage from './SignInUpPage';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format, addDays, set} from 'date-fns';
+import { format, addDays} from 'date-fns';
 import {apiOrgInfo} from './myFunctions';
+import NavMobile from './NavMobile';
 
 function App() {
   const [matches, setMatches] = useState([]);
@@ -21,7 +22,29 @@ function App() {
   const refPlayersStats = useRef({});
   const [readyRendering, setReadyRendering] = useState(false);
 
-  
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenSize({
+        //mottar aktuell skjermstørrelse
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [screenSize]);
+
+
+
   useEffect(() => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
 
@@ -67,7 +90,7 @@ function App() {
     
       <div className='App'>
         <Router>
-        <Navbar/>
+        {screenSize.width > 820 ? <Navbar /> : <NavMobile />}
         <div className='date-picker'>
           <button onClick={handlePrevDay}>&lt;Forrige dag</button>
           <DatePicker
