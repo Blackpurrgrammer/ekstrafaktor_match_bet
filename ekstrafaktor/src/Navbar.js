@@ -4,7 +4,7 @@ import Search from './Search';
 import SignInUpButton from './SignInUpH';
 import { Link, useLocation } from 'react-router-dom';
 
-const Navbar = () => {
+const Navbar = (props) => {
   const location = useLocation();
   const hideNavbarPaths = ['/Signin'];
 
@@ -30,7 +30,12 @@ const Navbar = () => {
           <Link to="/Avgjorende_skader">Avgjørende Skader</Link>
         </li>
         <li>
-          <Search />
+          <Search 
+            query={props.query}
+            setQuery={props.setQuery}
+            location={location}
+            selectedDate={props.selectedDate}
+             />
         </li>
         <li>
           <Link to="/Signin"><SignInUpButton /></Link>

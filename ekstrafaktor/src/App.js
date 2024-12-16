@@ -14,6 +14,7 @@ import NavMobile from './NavMobile';
 function App() {
   const [matches, setMatches] = useState([]);
   const [injuries, setInjuries] = useState([]);
+  // const [searchedInjuries, setSearchedInjuries] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toggle, setToggle] = useState(false);
   const [teamsPlayedMatches, setTeamsPlayedMatches] = useState({});
@@ -21,6 +22,7 @@ function App() {
   const refTeamsPlayed = useRef({});
   const refPlayersStats = useRef({});
   const [readyRendering, setReadyRendering] = useState(false);
+  const [query, setQuery] = useState('');
 
   const [screenSize, setScreenSize] = useState({
     width: window.innerWidth,
@@ -61,7 +63,7 @@ function App() {
     const fetchInjuries = async () => {
       fetch(injuriesEndpoint.apiAddress, injuriesEndpoint.requestOptions)
         .then(response => response.json())
-        .then(data => setInjuries(data.response))
+        .then(data => {setInjuries(data.response)})
         .catch(error => console.log('injuries error', error));
     };
     
@@ -90,7 +92,11 @@ function App() {
     
       <div className='App'>
         <Router>
-        {screenSize.width > 820 ? <Navbar /> : <NavMobile />}
+        {screenSize.width > 820 ? 
+        <Navbar 
+          query={query}
+          setQuery={setQuery}
+          selectedDate={selectedDate} /> : <NavMobile />}
         <div className='date-picker'>
           <button onClick={handlePrevDay}>&lt;Forrige dag</button>
           <DatePicker
@@ -115,6 +121,7 @@ function App() {
             setPlayerStats={setPlayerStats}
             refTeamsPlayed={refTeamsPlayed}
             refPlayersStats={refPlayersStats}
+            query={query}
             />} />
           <Route path="/Spilte_kamper" element={<SpilteKamper 
             injuries={injuries} 
@@ -127,6 +134,7 @@ function App() {
             setPlayerStats={setPlayerStats}
             refTeamsPlayed={refTeamsPlayed}
             refPlayersStats={refPlayersStats}
+            query={query}
              />} />
           <Route path="/Avgjorende_skader" element={<AvgjorendeSkader 
             injuries={injuries} 
@@ -139,6 +147,7 @@ function App() {
             refPlayersStats={refPlayersStats}
             readyRendering={readyRendering}
             setReadyRendering={setReadyRendering}
+            query={query}
              />} />
           <Route path="/Signin" element={<SignInUpPage />} />
         </Routes>

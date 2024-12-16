@@ -132,6 +132,18 @@ const evaluatePlayerStatus = (playerImpactValue) => {
       throw error;
     }
   }
+
+
+  const filterList = (list, query, keys) => {
+    return list?.filter(item =>
+      keys.some(key =>//sjekker om noen av nøklene i keys er i item - deles opp i array
+        /[.]/.test(key)?//nestede nøkler
+            item[key.split('.')[0]][key.split('.')[1]].toString().toLowerCase().includes(query.toLowerCase())
+          ://ingen nested nøkler
+            item[key].toString().toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  };
  
   
-export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats, fetchSidelinedDate, evaluatePlayerStatus};
+export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats, fetchSidelinedDate, evaluatePlayerStatus, filterList};

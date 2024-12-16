@@ -6,6 +6,7 @@ import {fetchSidelinedDate } from './myFunctions';
 import ReactPaginate from 'react-paginate';
 import FilterDrawer from './FilterDrawer';
 import FactorIndicator from './FactorIndicator';
+import { filterList } from './myFunctions';
 
 
 
@@ -86,7 +87,7 @@ const AvgjorendeSkader = (props) => {
     const filteringLeagueList = [];
     const filteringTeamList = [];
     const filteringInjuryTypeList = [];
-    const resultat = lengthPlayersStats === lengthPlayersInjured && lengthPlayersInjured>0 && (currentItems.length===0 || fetchedPlayersArrayKeys.length>0);
+    // const resultat = lengthPlayersStats === lengthPlayersInjured && lengthPlayersInjured>0 && (currentItems.length===0 || fetchedPlayersArrayKeys.length>0);
     
     if (lengthPlayersStats === lengthPlayersInjured && lengthPlayersInjured>0 && (currentItems.length===0 || fetchedPlayersArrayKeys.length>0)) {//sjekker om alle spillere har vært innom API kall fetchSidelinedDate
       props.setReadyRendering(true);
@@ -103,11 +104,12 @@ const AvgjorendeSkader = (props) => {
     }
 
     if (props.readyRendering) {//klarsignal for at alle spillere har blitt hentet og kan starte paginerings beregning
-      const items = Object.values(props.playerStats).filter((player) =>//hjelper filter komponenten for å filtrere ut spillere
+      const preparedItems = Object.values(props.playerStats).filter((player) =>//hjelper filter komponenten for å filtrere ut spillere
         keysObjectArray.includes(player.id.toString()) &&
         emptyArrayFiltering(filteringLeagueList, player.leagueId.toString()) &&
         emptyArrayFiltering(filteringTeamList, player.teamId.toString()) &&
         emptyArrayFiltering(filteringInjuryTypeList, player.injuryType));//filtrerer ut skadede spillere for kampdato
+      const items = filterList(preparedItems, props.query, ["name", "team", "injuryType", "duration"]);//filtrerer ut spillere for søkefeltet  
       const endOffset = itemOffset + itemsPerPage;//regner siste liste indeks for hver side
       const newCurrentItems = items.slice(itemOffset, endOffset);//indekserer mengden som skal vises på visning side
       const newPageCount = Math.ceil(items.length / itemsPerPage);
@@ -147,7 +149,6 @@ const AvgjorendeSkader = (props) => {
     setItemOffset(newOffset);
 
   };
-  
   
   return (
     <div>
@@ -193,7 +194,13 @@ const AvgjorendeSkader = (props) => {
                       <td>{stats.duration}</td>
                       <td>{stats.injuryType}</td>
                       {/* vurderer hvor stor innvirkning spilleren har på laget */}
-                      <td><FactorIndicator item={stats} showType='Player' playerStats={props.playerStats} teamsPlayedMatches={props.teamsPlayedMatches} /></td>
+                      <td><FactorIndicator 
+                        item={stats}
+                        showType='Player'
+                        playerStats={props.playerStats}
+                        setPlayerStats={props.setPlayerStats}
+                        teamsPlayedMatches={props.teamsPlayedMatches}
+                         /></td>
                     </tr>
                   );
                 } else {

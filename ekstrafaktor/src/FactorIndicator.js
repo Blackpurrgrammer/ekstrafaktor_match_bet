@@ -4,7 +4,7 @@ import { evaluateMatchStatus, evaluatePlayerStatus, evaluatePlayerImpact } from 
 const FactorIndicator = (props) => {
     const colorMap = { r: "#C10037", y: "#EFF50E" };
     if(props.showType ==='Match'){
-        const filteredStatsTeam = props.importInjuries.filter(
+        const filteredStatsTeam = props.queriedInjuries.filter(
         (injured) => [props.item.teams.home.name, props.item.teams.away.name].includes(injured.team.name)
         )
         const statsPlayersMatches=filteredStatsTeam.map((injuredPlayer) => {

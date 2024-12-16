@@ -22,6 +22,7 @@ const SpilteKamper = (props) => {
         setPlayerStats={props.setPlayerStats}
         refTeamsPlayed={props.refTeamsPlayed}
         refPlayersStats={props.refPlayersStats}
+        query={props.query}
          />
         ) : (
       <div>Loading matches or no matches found...</div>

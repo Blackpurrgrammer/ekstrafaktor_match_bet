@@ -1,7 +1,7 @@
 
 .App {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 .App-logo {
@@ -317,6 +317,10 @@ ul li{
 }
 
 
+}
+
+.hidden {
+  visibility: hidden;
 }
 
 

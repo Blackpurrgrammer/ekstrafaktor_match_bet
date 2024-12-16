@@ -2,13 +2,13 @@ import React from 'react'
 import './App.css';
 import { useEffect} from 'react';
 import FactorIndicator from './FactorIndicator';
-import { fetchPlayerStats, fetchTeamStats} from './myFunctions';
+import { fetchPlayerStats, fetchTeamStats, filterList} from './myFunctions';
 
 const MatchListing = (props) => {
-  
+  let queriedInjuries = filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country']);//filtrerer skade data basert på søkeord
   const leaguesObjects = [];
   const leagues = Array.from(new Set(props.importMathces.map((match) => match.league.id)));//alle ligaene 
-  const leagueInjuries = [...new Set(props.importInjuries.map(dataLeague=> dataLeague.league.id))]//alle ligaene med skade data
+  const leagueInjuries = [...new Set(queriedInjuries.map(dataLeague=> dataLeague.league.id))]//alle ligaene med skade data
   const filterLeagueInjrs = leagues.filter((fixture)=> leagueInjuries.includes(fixture));//viser kamper fra ligaer med skade data
   filterLeagueInjrs.forEach((league) => {
     let leagueName = props.importMathces.find((match) => match.league.id === league)?.league.name;
@@ -24,10 +24,11 @@ const MatchListing = (props) => {
   
 
   useEffect(() => {
+    queriedInjuries = filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country']);
     let toggleMathces = props.importMathces.filter((match) => match.league.id === props.toggle);
     
     let toggleTeamInjuries = toggleMathces.flatMap((match) => {
-      return props.importInjuries.filter(injured => 
+      return queriedInjuries.filter(injured => 
         [match.teams.home.name, match.teams.away.name].includes(injured.team.name)
       );
     });
@@ -58,7 +59,7 @@ const MatchListing = (props) => {
         
     processInjuries();
 
-  }, [props.toggle]);
+  }, [props.toggle, props.query]);
 
   
   const handleToggle = (leagueId) => {//render kamper fra en bestemt liga av gangen når vis knappen trykkes
@@ -94,7 +95,7 @@ const MatchListing = (props) => {
                           <div style={{gridColumn: "4 / 4"}}>skader:
                             {/* samlet skade innvirkning per kamp*/}
                             {<FactorIndicator item={match}
-                               importInjuries={props.importInjuries}
+                               queriedInjuries={queriedInjuries}
                                playerStats={props.playerStats}
                                teamsPlayedMatches={props.teamsPlayedMatches}
                                showType='Match' />}
