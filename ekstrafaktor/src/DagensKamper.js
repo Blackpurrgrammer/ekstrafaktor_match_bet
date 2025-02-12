@@ -12,6 +12,7 @@ const DagensKamper = (props) => {
     <div>
         {props.matches && props.injuries ? (
       <MatchListing importMathces={props.matches.filter((item)=>notStartedFilter(item))}
+        setMatches={props.setMatches}
         importInjuries={props.injuries} 
         toggle={props.toggle}
         setToggle={props.setToggle} 

@@ -75,6 +75,20 @@ ul li{
   width: 958px;
 }
 
+
+
+.grid-item-each-team-players-lstng{
+  display: grid;
+  font-family: Arial, Helvetica, sans-serif;
+  border: 1px solid black;
+  padding: 0px;/* 10px */
+  text-align: center;
+  grid-template-columns: 489px 489px;
+  gap: 0;
+  width: 958px;
+}
+
+
 .pagination {
   list-style: none;
   display: flex;

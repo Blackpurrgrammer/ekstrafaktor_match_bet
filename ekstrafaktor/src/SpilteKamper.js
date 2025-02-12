@@ -12,6 +12,7 @@ const SpilteKamper = (props) => {
         {props.matches && props.injuries ? (
       <MatchListing 
         importMathces={props.matches.filter((item)=>finishedFilter(item))} 
+        setMatches={props.setMatches}
         importInjuries={props.injuries} 
         toggle={props.toggle}
         setToggle={props.setToggle} 

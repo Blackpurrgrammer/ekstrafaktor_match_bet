@@ -54,7 +54,7 @@ const evaluatePlayerStatus = (playerImpactValue) => {
 
   const fetchTeamStats = async (leagueID, teamID, fixtureDate, setState, refVar) => {
       
-    const teamStatsApi = apiOrgInfo("teams/statistics", [{ league: leagueID}, {season: "2023"}, {team: teamID}, {date: fixtureDate}]);
+    const teamStatsApi = apiOrgInfo("teams/statistics", [{ league: leagueID}, {season: "2024"}, {team: teamID}, {date: fixtureDate}]);
     if (teamStatsApi) { 
     try {
       const response = await fetch(teamStatsApi.apiAddress, teamStatsApi.requestOptions);
@@ -72,27 +72,42 @@ const evaluatePlayerStatus = (playerImpactValue) => {
   };
 
   
-  const fetchPlayerStats = async (playerID, teamID, setState, setRef, currentLeagueId, currentLeagueName) => {
-    const playerStatsApi = apiOrgInfo("players", [{ id: playerID}, {season: "2023"}, {team: teamID}]);
+  const fetchPlayerStats = async (playerID, teamID, setState, setRef, currentLeagueId, currentLeagueName, playersName, playersTeamName) => {
+    const playerStatsApi = apiOrgInfo("players", [{ id: playerID}, {season: "2024"}, {team: teamID}]);
     try {
       
       const response = await fetch(playerStatsApi.apiAddress, playerStatsApi.requestOptions);
       const string = await response.text();
       const playerStats = string===""? {}: JSON.parse(string);
-      const totalMatches = playerStats.response[0].statistics[0].games.lineups;
-      const playerName = playerStats.response[0].player.name;
-      const playerTeam = playerStats.response[0].statistics[0].team.name;
-      const playerTeamId = playerStats.response[0].statistics[0].team.id;
-      setState(prevPlayerStats => ({ ...prevPlayerStats, 
-        [playerID]: {"played": totalMatches,
-           "name": playerName,
-            "team": playerTeam,
-             "teamId": playerTeamId,
-             "league": currentLeagueName,
-              "leagueId": currentLeagueId,
-              "id": playerID}}));
-      setRef.current[playerID] = totalMatches;
-      return playerStats;//få frem hovedliga 
+      
+      if (playerStats.response.length!==0){
+        const totalMatches = playerStats.response[0].statistics[0].games.lineups;
+        const playerName = playerStats.response[0].player.name;
+        const playerTeam = playerStats.response[0].statistics[0].team.name;
+        const playerTeamId = playerStats.response[0].statistics[0].team.id;
+        setState(prevPlayerStats => ({ ...prevPlayerStats, 
+          [playerID]: {"played": totalMatches,
+            "name": playerName,
+              "team": playerTeam,
+              "teamId": playerTeamId,
+              "league": currentLeagueName,
+                "leagueId": currentLeagueId,
+                "id": playerID}}));
+        setRef.current[playerID] = totalMatches;
+        return playerStats;//få frem hovedligaen spilleren spiller i
+        }else{
+          setState(prevPlayerStats => ({ ...prevPlayerStats, 
+            [playerID]: {"played": 0,
+               "name": playersName,
+                "team": playersTeamName,
+                 "teamId": teamID,
+                 "league": currentLeagueName,
+                  "leagueId": currentLeagueId,
+                  "id": playerID}}));
+          setRef.current[playerID] = 0;
+        return null;
+        }
+       
     } catch (error) {
       console.log(`Error: ${error}`);
       throw error;

@@ -112,7 +112,8 @@ function App() {
         <Routes>
           <Route path="/" element={<DagensKamper
             injuries={injuries}
-            matches={matches} 
+            matches={matches}
+            setMatches={setMatches} 
             toggle={toggle} 
             setToggle={setToggle} 
             teamsPlayedMatches={teamsPlayedMatches}
@@ -125,7 +126,8 @@ function App() {
             />} />
           <Route path="/Spilte_kamper" element={<SpilteKamper 
             injuries={injuries} 
-            matches={matches}  
+            matches={matches}
+            setMatches={setMatches}  
             toggle={toggle} 
             setToggle={setToggle}
             teamsPlayedMatches={teamsPlayedMatches}
