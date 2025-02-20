@@ -72,7 +72,15 @@ const evaluatePlayerStatus = (playerImpactValue) => {
   };
 
   
-  const fetchPlayerStats = async (playerID, teamID, setState, setRef, currentLeagueId, currentLeagueName, playersName, playersTeamName) => {
+  const fetchPlayerStats = async (
+      playerID, 
+      teamID, 
+      setState, 
+      setRef, 
+      currentLeagueId, 
+      currentLeagueName, 
+      playersName, 
+      playersTeamName) => {
     const playerStatsApi = apiOrgInfo("players", [{ id: playerID}, {season: "2024"}, {team: teamID}]);
     try {
       
@@ -159,6 +167,29 @@ const evaluatePlayerStatus = (playerImpactValue) => {
       )
     );
   };
+
+  const fetchTeamCountryInfo = async (teamID) => {//henter landet til laget 
+    const teamCountryApi = apiOrgInfo("teams", [{ id: teamID}]);
+    try {
+      const response = await fetch(teamCountryApi.apiAddress, teamCountryApi.requestOptions);
+      const string = await response.text();
+      const teamCountry = string===""? {}: JSON.parse(string);
+      console.log(teamCountry.response[0].team.country);
+      return teamCountry.response[0].team.country;
+    } catch (error) {
+      console.log(`Error: ${error}`);
+      throw error;
+    }
+  };
  
   
-export {apiOrgInfo, evaluatePlayerImpact, evaluateMatchStatus, fetchPlayerStats, fetchTeamStats, fetchSidelinedDate, evaluatePlayerStatus, filterList};
+export {
+  apiOrgInfo,
+  evaluatePlayerImpact,
+  evaluateMatchStatus, 
+  fetchPlayerStats, 
+  fetchTeamStats, 
+  fetchSidelinedDate, 
+  evaluatePlayerStatus, 
+  filterList,
+  fetchTeamCountryInfo};
