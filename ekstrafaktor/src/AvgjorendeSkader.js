@@ -197,9 +197,6 @@ const AvgjorendeSkader = (props) => {
                       <td><FactorIndicator 
                         item={stats}
                         showType='Player'
-                        playerStats={props.playerStats}
-                        setPlayerStats={props.setPlayerStats}
-                        teamsPlayedMatches={props.teamsPlayedMatches}
                          /></td>
                     </tr>
                   );

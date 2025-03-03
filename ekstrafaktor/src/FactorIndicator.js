@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import './App.css';
-import { evaluateMatchStatus, evaluatePlayerStatus, evaluatePlayerImpact } from './myFunctions';
+import { evaluateMatchStatus, evaluatePlayerStatus } from './myFunctions';
 
 const FactorIndicator = React.memo((props) => {//memo hindrer uendelig rendering
     const colorMap = { r: "#C10037", y: "#EFF50E" };
@@ -38,8 +38,7 @@ const FactorIndicator = React.memo((props) => {//memo hindrer uendelig rendering
                 </span>);
 
     }else if(props.showType ==='Player'){//gjelder status per spiller ikke kamp
-        let impacts = evaluatePlayerImpact(props.item.played / props.teamsPlayedMatches[props.item.teamId]);
-        let indicatorStatus = evaluatePlayerStatus(impacts);
+        let indicatorStatus = evaluatePlayerStatus(props.item.status);//hver spiller med egen status
         let criclecolor = colorMap[indicatorStatus];
         return (<span>
                     <div className='circle' style={{ '--circle-color': criclecolor }} 

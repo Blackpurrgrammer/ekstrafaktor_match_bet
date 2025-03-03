@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css';
-import { useEffect, useState} from 'react';
+import { useEffect, useState, useMemo, useCallback} from 'react';
 import FactorIndicator from './FactorIndicator';
 import { evaluatePlayerImpact, fetchPlayerStats, fetchTeamCountryInfo, fetchTeamStats, filterList} from './myFunctions';
 import { Spin } from 'antd';
@@ -24,7 +24,7 @@ const MatchListing = (props) => {
     }
   });
   
-  
+  const memoizedCurrentMatchStatus = useMemo(()=> currentMatchStatus, [currentMatchStatus])
 
   useEffect(() => {
     queriedInjuries = filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country']);
@@ -109,7 +109,9 @@ const MatchListing = (props) => {
       prevMatches.map(match =>
         leagueMatches.map(match => match.fixture.id).includes(match.fixture.id)
           ? { ...match, teams: { ...match.teams, 
-            players: leagueInjuries.filter(injury=>injury.fixture.id===match.fixture.id) } } 
+            players: leagueInjuries.filter(injury=>injury.fixture.id===match.fixture.id) },
+            fixture: { ...match.fixture, showInjuries: false }
+           } 
           : match
       )
     );
@@ -161,8 +163,80 @@ const MatchListing = (props) => {
 
   }, [props.toggle, props.playerStats]);
 
-  
 
+  const  handleFactorIndicatorClick = (fixtureId) => {//håndterer visning visning per kamp
+    props.setMatches(prevMatches =>
+      prevMatches.map(match => match.fixture.id === fixtureId
+        ? { ...match, fixture: { ...match.fixture, showInjuries: !match.fixture.showInjuries } }//flipper visning verdi
+        : match
+      ));
+  };
+    
+
+  const renderInjuredPlayers = (match) => {
+    //filtrering av hvert lags spillere i aktuell kamp som er trykket på
+    let homePlayers = match.teams.players.filter(player => player.team.id === match.teams.home.id);
+    let awayPlayers = match.teams.players.filter(player => player.team.id === match.teams.away.id);
+    //lengste listen av lagets spillere slik at griden blir lang nok
+    let longestIndex = homePlayers.length > awayPlayers.length ? homePlayers.length : awayPlayers.length;
+    let injuredPlayers = [];//samler all jsx komponenter for riktig grid visning
+  
+    for (let i = 0; i < longestIndex; i++) {
+      if (homePlayers[i] && awayPlayers[i]) {//plassering skjer i begge kolonnene pga eksistens i hver liste
+        //kolonnene har to justerings avstands kolonner slik at plassering av spillere for hvert lag blir riktig
+        injuredPlayers.push(
+          <div key={i} className='grid-item-injury'>
+            <div style={{gridColumn:  "2 / 3"}}>{/*Plassering i andre kolonne for mer presis plassering*/}
+              <FactorIndicator
+                showType={'Player'}
+                item={props.playerStats[homePlayers[i].player.id]}
+                 />
+            </div>
+            <div style={{gridColumn: "3 / 4", textAlign: "start"}}>{/*Følger FactorIndicator som hoved marg*/}
+              {homePlayers[i].player.name}
+            </div>
+            <div style={{gridColumn: "6 / 7"}}>
+              <FactorIndicator
+                showType={'Player'}
+                item={props.playerStats[awayPlayers[i].player.id]}
+                 />
+            </div>
+            <div style={{gridColumn: "7 / 7", textAlign: "start"}}>{/*Følger FactorIndicator som hoved marg*/}
+              {awayPlayers[i].player.name}
+            </div>
+          </div>
+        );
+      } else if (homePlayers[i]) {//plassering skjer i venstre kolonne pga kun eksistens for hjemmelaget 
+        injuredPlayers.push(
+          <div key={i} className='grid-item-injury'>
+            <div style={{gridColumn:  "2 / 3"}}>
+              <FactorIndicator
+                showType={'Player'}
+                item={props.playerStats[homePlayers[i].player.id]}
+                 />
+            </div>
+            <div style={{gridColumn: "3 / 4", textAlign: "start"}}>{homePlayers[i].player.name}</div>
+          </div>
+        );
+      } else if (awayPlayers[i]) {//plassering skjer i høyre kolonne pga kun eksistens for bortelaget
+        injuredPlayers.push(
+          <div key={i} className='grid-item-injury'>
+            <div style={{gridColumn: "6 / 7"}}>
+              <FactorIndicator
+                  showType={'Player'}
+                  item={props.playerStats[awayPlayers[i].player.id]}
+                  />
+            </div>
+            <div style={{gridColumn: "7 / 7", textAlign: "start"}}>{awayPlayers[i].player.name}</div>
+          </div>
+        );
+      }
+    }
+  
+    return injuredPlayers;//tilslutt blir hele griden returnert for visning blant komponentene
+  };
+  
+  
         return (
       <div>
         <div className="grid-container-mthL">
@@ -182,6 +256,7 @@ const MatchListing = (props) => {
                   props.importMathces
                     .filter((match) => match.league.id === league.id)
                     .map((match) => (
+                      <div>
                       <div key={match.fixture.id} className='grid-item-mtch-lstng'>
                           <div style={{gridColumn: "1 / 2"}}>{match.teams.home.name}</div>
                           <div style={{gridColumn: "2 / 3"}}>
@@ -191,13 +266,16 @@ const MatchListing = (props) => {
                           <div style={{gridColumn: "4 / 4"}}>
                             <div>skader:</div>
                             {match.teams?.status &&//viser status indikator om kampen allerede har mottatt status
-                              <FactorIndicator item={match}
+                              <div onClick={() => handleFactorIndicatorClick(match.fixture.id)}>
+                                <FactorIndicator item={match}
                                 queriedInjuries={queriedInjuries}
                                 playerStats={props.playerStats}
                                 teamsPlayedMatches={props.teamsPlayedMatches}
                                 showType='Match'
                                 setCurrentMatchStatus={setCurrentMatchStatus}
-                                currentMatchStatus={currentMatchStatus} />}
+                                currentMatchStatus={currentMatchStatus} />
+                              </div>
+                              }
                             {/*Spiner imens data innhenting av stauts pågår for hver kamp*/}
                             {!(match.teams.players.filter(injuredPlayer=> props.playerStats[injuredPlayer.player.id]
                               && Object.keys(props.playerStats[injuredPlayer.player.id]).includes("status")).length===match.teams.players.length)
@@ -208,15 +286,25 @@ const MatchListing = (props) => {
                                 && Object.keys(props.playerStats[injuredPlayer.player.id]).includes("status")).length === match.teams.players.length
                                 //samlet skade innvirkning per kamp
                                 && (!match.teams?.status//etter første innlasting 
-                                  && <FactorIndicator item={match}
-                                      queriedInjuries={queriedInjuries}
-                                      playerStats={props.playerStats}
-                                  teamsPlayedMatches={props.teamsPlayedMatches}
-                                showType='Match'
-                                setCurrentMatchStatus={setCurrentMatchStatus}
-                                currentMatchStatus={currentMatchStatus} />)}
+                                  && 
+                                  <div onClick={()=>handleFactorIndicatorClick(match.fixture.id)} style={{cursor: 'pointer'}}>{/*Knappen aktiverer spillervisning under kampen */}
+                                    <FactorIndicator item={match}
+                                    queriedInjuries={queriedInjuries}
+                                    playerStats={props.playerStats}
+                                    teamsPlayedMatches={props.teamsPlayedMatches}
+                                    showType='Match'
+                                    setCurrentMatchStatus={setCurrentMatchStatus}
+                                    currentMatchStatus={currentMatchStatus} />
+                                  </div>)}
                           </div>
                       </div>
+                      {match.fixture.showInjuries &&//skadede spiller visning etter klikk på status indikator
+                      <div className="grid-item-container-injuries">
+                        {renderInjuredPlayers(match)}{/*skadede spillere vises i grid format*/}             
+                        </div>
+                        }
+                      </div>
+                      
                     ))
                 )}
             </div>

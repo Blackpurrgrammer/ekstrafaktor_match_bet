@@ -174,7 +174,7 @@ const evaluatePlayerStatus = (playerImpactValue) => {
       const response = await fetch(teamCountryApi.apiAddress, teamCountryApi.requestOptions);
       const string = await response.text();
       const teamCountry = string===""? {}: JSON.parse(string);
-      console.log(teamCountry.response[0].team.country);
+      
       return teamCountry.response[0].team.country;
     } catch (error) {
       console.log(`Error: ${error}`);

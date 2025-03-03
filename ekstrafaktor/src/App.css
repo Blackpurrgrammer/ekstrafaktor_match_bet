@@ -265,6 +265,19 @@ ul li{
   
 }
 
+.grid-container-injuries {
+  display: grid;
+  gap: 10px;
+}
+
+.grid-item-injury {
+  display: grid;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  grid-template-columns: 145px 50px 240px 46px 130px 50px 240px;
+}
+
 
 @media (max-width: 750px){/*smarttelefon oppsett*/
   .date-picker{
