@@ -24,6 +24,7 @@ const DagensKamper = (props) => {
         refTeamsPlayed={props.refTeamsPlayed}
         refPlayersStats={props.refPlayersStats}
         query={props.query}
+        screenSize={props.screenSize}
          />
         ) : (
       <div>Loading matches or no matches found...</div>

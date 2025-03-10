@@ -22,20 +22,24 @@ const FactorIndicator = React.memo((props) => {//memo hindrer uendelig rendering
         const impacts = players.map(playerId => props.playerStats[playerId]?.status);
         indicatorStatus = evaluateMatchStatus(impacts);//tildeles status
         let criclecolor = colorMap[indicatorStatus[0]];
-        return (<span>{players.length}
-                    <div className='circle' style={{ '--circle-color': criclecolor }}
-                    title='Match status indicator'>
-                    </div>
-                </span>);
+        return(<div className='factor-indicator-container'>
+            <span style={{gridColumn:"1"}}>{props.item.teams.players.length}</span>
+            <div className='circle' style={{ '--circle-color': criclecolor }}
+            title='Match status indicator'>
+            </div>
+        </div>)
+
 
     }else if(props.showType ==='Match' && !!props.item.teams.status){//skjer pga eksisterende status 
         // ingen tildeling av ny status oppstår her
         let criclecolor = colorMap[props.item.teams.status[0]];
-        return (<span>{props.item.teams.players.length}
-                    <div className='circle' style={{ '--circle-color': criclecolor }}
-                    title='Match status indicator'>
-                    </div>
-                </span>);
+        return(<div className='factor-indicator-container'>
+            <span style={{gridColumn:"1"}}>{props.item.teams.players.length}</span>{/*subgrid plassering*/}
+            <div className='circle' style={{ '--circle-color': criclecolor }}
+            title='Match status indicator'>
+            </div>
+        </div>)
+
 
     }else if(props.showType ==='Player'){//gjelder status per spiller ikke kamp
         let indicatorStatus = evaluatePlayerStatus(props.item.status);//hver spiller med egen status

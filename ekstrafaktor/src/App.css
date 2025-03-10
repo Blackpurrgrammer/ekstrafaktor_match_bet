@@ -70,7 +70,7 @@ ul li{
   border: 1px solid black;
   padding: 0px;/* 10px */
   text-align: center;
-  grid-template-columns: 434px 70px 354px 100px;
+  grid-template-columns: 434px 70px 354px 50px 50px;
   gap: 0;
   width: 958px;
 }
@@ -195,7 +195,16 @@ ul li{
   font-size: 14px;
 }
 
+.factor-indicator-container {
+  display: grid;
+  grid-template-columns: 30px 20px;
+  grid-template-rows: subgrid;
+  align-items: center;
+  justify-items: center;
+}
+
 .circle {
+  grid-column: 2;
   width: 13px;
   height: 13px;
   border-radius: 50%;
@@ -291,9 +300,9 @@ ul li{
     padding: 10px;
   }
   .grid-item-mtch-lstng{
-    grid-template-columns: 145px 30px 145px 38px;
-    font-size: 12px;
-    width: 93.5%;
+    grid-template-columns: 145px 50px 145px 58px;
+    font-size: 20px;
+    width: 99.5%;
   }
 
   .grid-item-border-league{
@@ -316,6 +325,33 @@ ul li{
   
   
 }
+
+.grid-item-injury {
+  grid-template-columns: 115px 50px 150px 60px;
+  border: none;
+
+}
+
+.centered-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ant-tabs-tab-btn {
+  color: rgba(6, 35, 59, 0.526);
+  text-shadow: 0 0 0.5px currentColor;
+}
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: rgb(6, 35, 59) !important;
+  text-shadow: 0 0 0.5px currentColor;
+}
+
+.circle{/*Forstørrer gir enklere mobil trykk*/
+  width: 20px;
+  height: 20px;
+  justify-content: center;
+}
+
 }
 
 @media (min-width: 751px) and (max-width: 1023px){/*tablet oppsett*/
@@ -343,6 +379,9 @@ ul li{
   
 }
 
+.grid-item-injury {
+  grid-template-columns: 75px 50px 190px 46px 75px 50px 190px; 
+}
 
 }
 

@@ -123,6 +123,7 @@ function App() {
             refTeamsPlayed={refTeamsPlayed}
             refPlayersStats={refPlayersStats}
             query={query}
+            screenSize={screenSize}
             />} />
           <Route path="/Spilte_kamper" element={<SpilteKamper 
             injuries={injuries} 
@@ -137,6 +138,7 @@ function App() {
             refTeamsPlayed={refTeamsPlayed}
             refPlayersStats={refPlayersStats}
             query={query}
+            screenSize={screenSize}
              />} />
           <Route path="/Avgjorende_skader" element={<AvgjorendeSkader 
             injuries={injuries} 

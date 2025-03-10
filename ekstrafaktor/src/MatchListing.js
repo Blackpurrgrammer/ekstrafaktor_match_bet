@@ -1,13 +1,15 @@
 import React from 'react'
 import './App.css';
-import { useEffect, useState, useMemo, useCallback} from 'react';
+import { useEffect, useState, useMemo} from 'react';
 import FactorIndicator from './FactorIndicator';
 import { evaluatePlayerImpact, fetchPlayerStats, fetchTeamCountryInfo, fetchTeamStats, filterList} from './myFunctions';
-import { Spin } from 'antd';
+import { Spin, Tabs } from 'antd';
+
 
 const MatchListing = (props) => {
   const [spinProgress, setSpinProgress] = useState({});
   const [currentMatchStatus, setCurrentMatchStatus] = useState({});
+  const [mobileClick, setMobileClick] = useState(false);
   let queriedInjuries = filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country']);//filtrerer skade data basert på søkeord
   const leaguesObjects = [];
   const leagues = Array.from(new Set(props.importMathces.map((match) => match.league.id)));//alle ligaene 
@@ -236,6 +238,35 @@ const MatchListing = (props) => {
     return injuredPlayers;//tilslutt blir hele griden returnert for visning blant komponentene
   };
   
+
+  const renderInjuredPlayersMobile = (match, change) => {
+    //lag rendering for mobil visning av skadede spillere som en et object for hvert lag home og away
+    let matchPlayers = {home: match.teams.players.filter(player => player.team.id === match.teams.home.id),
+        away: match.teams.players.filter(player => player.team.id === match.teams.away.id)}
+    let injuredPlayers = [];
+    let teamSwitch = change? "away" : "home";
+    for (let player of matchPlayers[teamSwitch]) {
+      injuredPlayers.push(
+        <div key={player.player.id} className='grid-item-injury'>
+          <div style={{gridColumn: "2/ 3"}}>
+            <FactorIndicator
+              showType={'Player'}
+              item={props.playerStats[player.player.id]}
+            />
+          </div>
+          <div style={{gridColumn: "3 / 4", textAlign: "start"}}>{player.player.name}</div>
+        </div>
+      );
+    }
+  
+    return injuredPlayers;
+
+
+  }
+
+  const handleMobileClickChoose = (key) => {
+    setMobileClick(key==='away');
+  }
   
         return (
       <div>
@@ -263,7 +294,7 @@ const MatchListing = (props) => {
                             {props.resultExist ? `${match.goals.home}-${match.goals.away}` : match.fixture.date.slice(11, 16)}
                           </div>
                           <div style={{gridColumn: "3 / 4"}}>{match.teams.away.name}</div>
-                          <div style={{gridColumn: "4 / 4"}}>
+                          <div style={{gridColumn: "4 / 5"}}>
                             <div>skader:</div>
                             {match.teams?.status &&//viser status indikator om kampen allerede har mottatt status
                               <div onClick={() => handleFactorIndicatorClick(match.fixture.id)}>
@@ -287,7 +318,7 @@ const MatchListing = (props) => {
                                 //samlet skade innvirkning per kamp
                                 && (!match.teams?.status//etter første innlasting 
                                   && 
-                                  <div onClick={()=>handleFactorIndicatorClick(match.fixture.id)} style={{cursor: 'pointer'}}>{/*Knappen aktiverer spillervisning under kampen */}
+                                  <div onClick={()=>handleFactorIndicatorClick(match.fixture.id)} style={{cursor: 'pointer'}} >{/*Knappen aktiverer spillervisning under kampen */}
                                     <FactorIndicator item={match}
                                     queriedInjuries={queriedInjuries}
                                     playerStats={props.playerStats}
@@ -298,9 +329,20 @@ const MatchListing = (props) => {
                                   </div>)}
                           </div>
                       </div>
-                      {match.fixture.showInjuries &&//skadede spiller visning etter klikk på status indikator
+                      {match.fixture.showInjuries && props.screenSize.width>750?//skadede spiller visning etter klikk på status indikator
                       <div className="grid-item-container-injuries">
                         {renderInjuredPlayers(match)}{/*skadede spillere vises i grid format*/}             
+                        </div>
+                        : match.fixture.showInjuries && props.screenSize.width<=750 &&//tilpasset mobil visning
+                        <div className="grid-item-container-injuries">{/*tab oppsett hensikt for smallest mobilvisning */}
+                          <Tabs defaultActiveKey="home" onChange={handleMobileClickChoose} className='centered-tabs' type='card'>
+                            <Tabs.TabPane tab="Hjemmelag" key="home">
+                              {renderInjuredPlayersMobile(match, false)}{/*trykkes en tab skifter funksjon tab pane*/}
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="Bortelag" key="away">
+                              {renderInjuredPlayersMobile(match, true)}
+                            </Tabs.TabPane>
+                          </Tabs>
                         </div>
                         }
                       </div>
