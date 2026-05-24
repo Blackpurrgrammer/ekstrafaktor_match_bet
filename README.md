@@ -18,7 +18,7 @@ Så kommer alle de aktuelle spillerne opp med detaljert statistikk:
 ![Fysisk bilde 1](Images/EF4.png)
 
 Etter man har trykket på filter knappen:
-![Fysisk bilde 1](Images/EF9.png)
+![Fysisk bilde 1](Images/EF10.png)
 
 I søk vinduet kan man søke på lagnavn som vises i bestemt turnering de spiller i når du befinner deg i Dagens kamper eller spilte kamper. På avgjørende skader er etternavnene spillerne søkbare.
 
