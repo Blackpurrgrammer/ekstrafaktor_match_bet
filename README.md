@@ -26,7 +26,8 @@ Ellers er prosjektet tilpasset dynamisk visning for både smattelefon- og tablet
 
 ### Smarttelefon
 ![Fysisk bilde 1](Images/EF5.png)
-###Tablet
+
+### Tablet
 ![Fysisk bilde 1](Images/EF6.png)
 
 ## Installasjon
