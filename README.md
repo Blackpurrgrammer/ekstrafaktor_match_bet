@@ -40,3 +40,8 @@ Ellers er prosjektet tilpasset dynamisk visning for både smattelefon- og tablet
 
 For tiden jobber jeg med en mer detaljert info tabell for skadede spillere på en bestemt dato der man skal se info som skadet dato, skadevarighet i dager og innvirkningsstatus.
 API kan kun innhente informasjon på 7500 utrekk per dag, og maks 300 utrekk per minutt(5 utrekk per sekund). Dette får konsekvenser når applikasjonen skal beregne skadestatus per kamp når man trykker på Vis knappen per liga.
+
+
+## Feil
+Akkurat nå er det en feil med vis funksjonen som viser duplisering av spillernavnene, og antall skader derfor må det deles med 2 for riktig antall skader som vises. Skal prøve å rette opp i dette.
+
