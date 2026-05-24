@@ -5,10 +5,10 @@ Alle kamper ut ifra dagensdato blir listet opp her som har skade info per liga f
 ![Fysisk bilde 1](Images/EF2.png)
 
 Slik ser det ut når du trykker på en vis knapp fra en liga ser du total antall skader for hver bestemte kamp. Status indikatoren indikerer om det har en stor innvirkning på kampen basert hvor mange VIKTIGE fotballspillere som ikke skal spille den bestemte kampen. De alternative fargene kan bli grønn, gul og rød. Der grønn betyr ingen innvirkning på kampen, gul står for det kan være, og rødt betyr at det er spillerne som er ute har garantert en stor innvirkning på kampen.
-[mangler bildet]
+![Fysisk bilde 1](Images/EF8.png)
 
 Trykker man på den fargede sirkelen blir de spesifikke spillerne listet opp på hver sin side under hvert sitt lag de er representert i. Da er det mulig å se hvilke spesifikke spillere det gjelder, og hvor stor virkning hver spesifikke fotballspiller er for kampen.
-![Fysisk bilde 1](Images/EF1.png)
+![Fysisk bilde 1](Images/EF9.png)
 
 På avgjørende skader siden viser den ekstra statistikk på fotballspillere som er ut hentet fra ligaene du har trykket vis knappen på forhånd. Helt på toppen til høyre spiller detalj tabellen vises en filter knapp der man kan filtrere på kriteriene: ligaer, type skade, og fotball lag. Nederst ser man pagenering der man kan navigere mellom sidene ved hjelp av knappene forrige og neste. Som skal være forbyggende mot nedover scrolling.
 Først må man vente litt på lasting av spiller data:
@@ -18,7 +18,7 @@ Så kommer alle de aktuelle spillerne opp med detaljert statistikk:
 ![Fysisk bilde 1](Images/EF4.png)
 
 Etter man har trykket på filter knappen:
-[mangler bildet]
+![Fysisk bilde 1](Images/EF9.png)
 
 I søk vinduet kan man søke på lagnavn som vises i bestemt turnering de spiller i når du befinner deg i Dagens kamper eller spilte kamper. På avgjørende skader er etternavnene spillerne søkbare.
 
