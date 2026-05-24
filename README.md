@@ -1,5 +1,11 @@
-# ekstrafaktor_match_bet
+# Ekstrafaktor_match_bet
 
+##Beskrivelse med bilder for hver side av appen
+Alle kamper ut ifra dagensdato blir listet opp her som har skade info per liga fra API leverandøren. Altså dagens kamper representerer uspilte kamper. Det er også mulig å navigere seg frem og tilbake for historiske resultater samtidig å se skade status tilbake i tid. For å se de historiske kampene bli listet opp gjøres det ved trykke på spilte kamper øverst i navbar-en.
+![Fysisk bilde 1](Images/EF1.png)
+
+
+##Installasjon
 1. Hent ut filene fra repo
 
 2. Start server fra cors-proxy/server.js med node.js for unngå cors-policy feil
