@@ -1,6 +1,6 @@
 # Ekstrafaktor_match_bet
 
-##Beskrivelse med bilder for hver side av appen
+## Beskrivelse med bilder for hver side av appen
 Alle kamper ut ifra dagensdato blir listet opp her som har skade info per liga fra API leverandøren. Altså dagens kamper representerer uspilte kamper. Det er også mulig å navigere seg frem og tilbake for historiske resultater samtidig å se skade status tilbake i tid. For å se de historiske kampene bli listet opp gjøres det ved trykke på spilte kamper øverst i navbar-en.
 ![Fysisk bilde 1](Images/EF2.png)
 
@@ -8,7 +8,7 @@ Slik ser det ut når du trykker på en vis knapp fra en liga ser du total antall
 [mangler bildet]
 
 Trykker man på den fargede sirkelen blir de spesifikke spillerne listet opp på hver sin side under hvert sitt lag de er representert i. Da er det mulig å se hvilke spesifikke spillere det gjelder, og hvor stor virkning hver spesifikke fotballspiller er for kampen.
-![Fysisk bilde 1](Images/EF2.png)
+![Fysisk bilde 1](Images/EF1.png)
 
 På avgjørende skader siden viser den ekstra statistikk på fotballspillere som er ut hentet fra ligaene du har trykket vis knappen på forhånd. Helt på toppen til høyre spiller detalj tabellen vises en filter knapp der man kan filtrere på kriteriene: ligaer, type skade, og fotball lag. Nederst ser man pagenering der man kan navigere mellom sidene ved hjelp av knappene forrige og neste. Som skal være forbyggende mot nedover scrolling.
 Først må man vente litt på lasting av spiller data:
@@ -24,12 +24,12 @@ I søk vinduet kan man søke på lagnavn som vises i bestemt turnering de spille
 
 Ellers er prosjektet tilpasset dynamisk visning for både smattelefon- og tabletvisning(se bildene nedover her).
 
-###Smarttelefon
+### Smarttelefon
 ![Fysisk bilde 1](Images/EF5.png)
 ###Tablet
 ![Fysisk bilde 1](Images/EF6.png)
 
-##Installasjon
+## Installasjon
 1. Hent ut filene fra repo
 
 2. Start server fra cors-proxy/server.js med node.js for unngå cors-policy feil
