@@ -168,6 +168,23 @@ const evaluatePlayerStatus = (playerImpactValue) => {
     );
   };
 
+  const dedupeInjuriesByPlayerId = (injuries = []) => {//fjerner duplikater i skadelisten basert på spiller ID og kamp ID
+    const seen = new Set();
+
+    return injuries.filter((injury) => {//henter ut kamp ID og spiller ID for hver skade, og lager en unik nøkkel for hver kombinasjon
+      const fixtureId = injury?.fixture?.id ?? 'unknown-fixture';
+      const playerId = injury?.player?.id ?? injury?.player?.name ?? 'unknown-player';
+      const key = `${fixtureId}-${playerId}`;
+
+      if (seen.has(key)) {//hvis nøkkelen allerede er sett, er det en duplikat, og den filtreres ut 
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  };
+
   const fetchTeamCountryInfo = async (teamID) => {//henter landet til laget 
     const teamCountryApi = apiOrgInfo("teams", [{ id: teamID}]);
     try {
@@ -192,4 +209,5 @@ export {
   fetchSidelinedDate, 
   evaluatePlayerStatus, 
   filterList,
+  dedupeInjuriesByPlayerId,
   fetchTeamCountryInfo};

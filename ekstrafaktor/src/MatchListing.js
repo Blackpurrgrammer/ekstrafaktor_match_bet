@@ -2,7 +2,7 @@ import React from 'react'
 import './App.css';
 import { useEffect, useState, useMemo} from 'react';
 import FactorIndicator from './FactorIndicator';
-import { evaluatePlayerImpact, fetchPlayerStats, fetchTeamCountryInfo, fetchTeamStats, filterList} from './myFunctions';
+import { dedupeInjuriesByPlayerId, evaluatePlayerImpact, fetchPlayerStats, fetchTeamCountryInfo, fetchTeamStats, filterList} from './myFunctions';
 import { Spin, Tabs } from 'antd';
 
 
@@ -10,7 +10,9 @@ const MatchListing = (props) => {
   const [spinProgress, setSpinProgress] = useState({});
   const [currentMatchStatus, setCurrentMatchStatus] = useState({});
   const [mobileClick, setMobileClick] = useState(false);
-  let queriedInjuries = filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country']);//filtrerer skade data basert på søkeord
+  const queriedInjuries = dedupeInjuriesByPlayerId(
+    filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country'])
+  );//filtrerer skade data basert på søkeord
   const leaguesObjects = [];
   const leagues = Array.from(new Set(props.importMathces.map((match) => match.league.id)));//alle ligaene 
   const leagueInjuries = [...new Set(queriedInjuries.map(dataLeague=> dataLeague.league.id))]//alle ligaene med skade data
@@ -25,11 +27,12 @@ const MatchListing = (props) => {
       leaguesObjects.push({name : leagueName, country : leagueCountry, id : leagueID, TeamsID : teams, fixture : date});//filter pga med kun de ligaene med data om skader
     }
   });
-  
+  console.log("qinj:",queriedInjuries);//sjekk for å se at filtrering av skadedata fungerer som den skal
+  console.log("leaguesObjects:",leaguesObjects);
+
   const memoizedCurrentMatchStatus = useMemo(()=> currentMatchStatus, [currentMatchStatus])
 
   useEffect(() => {
-    queriedInjuries = filterList(props.importInjuries, props.query, ['team.name', 'fixture.id', 'league.name', 'league.country']);
     let toggleMathces = props.importMathces.filter((match) => match.league.id === props.toggle);
     
     let toggleTeamInjuries = toggleMathces.flatMap((match) => {
